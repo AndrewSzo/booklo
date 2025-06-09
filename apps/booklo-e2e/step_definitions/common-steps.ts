@@ -49,7 +49,7 @@ Then('the current URL should contain {string}', async function(this: ICustomWorl
 });
 
 Then('the current URL should be {string}', async function(this: ICustomWorld, expectedUrl: string) {
-  const baseUrl = process.env.BASE_URL || 'http://localhost:3001';
+  const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
   const fullExpectedUrl = expectedUrl.startsWith('http') ? expectedUrl : `${baseUrl}${expectedUrl}`;
   await expect(this.page!).toHaveURL(fullExpectedUrl);
 });

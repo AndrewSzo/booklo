@@ -24,7 +24,8 @@ export class HomePage extends BasePage {
    * Navigate to home page
    */
   async goto(): Promise<void> {
-    await this.page.goto(this.baseUrl);
+    console.log('HomePage: Navigating to', this.baseUrl);
+    await this.page.goto(this.baseUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
     await this.waitForPageLoad();
   }
 
@@ -32,8 +33,12 @@ export class HomePage extends BasePage {
    * Wait for page to load completely
    */
   async waitForPageLoad(): Promise<void> {
-    await this.page.waitForLoadState('networkidle');
-    await this.waitForElement(this.heroSection);
+    console.log('HomePage: Waiting for page to load...');
+    await this.page.waitForLoadState('networkidle', { timeout: 30000 });
+    
+    console.log('HomePage: Waiting for hero section element...');
+    await this.waitForElement(this.heroSection, 30000);
+    console.log('HomePage: Hero section found!');
   }
 
   /**
