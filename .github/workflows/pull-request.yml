@@ -76,6 +76,9 @@ jobs:
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
       REPORT_PATH: ./reports
       SCREENSHOT_PATH: ./screenshots
     steps:
@@ -90,6 +93,18 @@ jobs:
 
       - name: Install main dependencies
         run: npm ci
+
+      - name: Build Next.js application
+        run: npm run build
+
+      - name: Start Next.js application
+        run: npm start &
+        env:
+          PORT: 3000
+
+      - name: Wait for application to be ready
+        run: |
+          timeout 60 bash -c 'until curl -f http://localhost:3000; do sleep 2; done'
 
       - name: Install E2E dependencies
         run: cd apps/booklo-e2e && npm ci
