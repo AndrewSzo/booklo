@@ -12,9 +12,10 @@ export interface AddBookModalProps {
   isOpen: boolean
   onClose: () => void
   onSuccess?: (book: BookResponseDTO) => void
+  'data-testid'?: string
 }
 
-export default function AddBookModal({ isOpen, onClose, onSuccess }: AddBookModalProps) {
+export default function AddBookModal({ isOpen, onClose, onSuccess, 'data-testid': testId }: AddBookModalProps) {
   const [isDirty, setIsDirty] = useState(false)
   const [showCloseConfirmation, setShowCloseConfirmation] = useState(false)
   const modalRef = useRef<HTMLDivElement>(null)
@@ -108,23 +109,25 @@ export default function AddBookModal({ isOpen, onClose, onSuccess }: AddBookModa
         aria-modal="true"
         aria-labelledby="modal-title"
         aria-describedby="modal-description"
+        data-testid={testId}
       >
         {/* Overlay */}
-        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" data-testid="modal-overlay" />
         
         {/* Modal Content */}
         <div 
           ref={modalRef}
           className="relative bg-background border rounded-lg shadow-lg w-full max-w-2xl max-h-[95vh] sm:max-h-[90vh] m-4 flex flex-col animate-in fade-in-0 zoom-in-95 duration-200"
           tabIndex={-1}
+          data-testid="modal-content"
         >
           {/* Modal Header */}
-          <div className="flex items-center justify-between p-6 border-b">
+          <div className="flex items-center justify-between p-6 border-b" data-testid="modal-header">
             <div>
-              <h2 id="modal-title" className="text-xl font-semibold text-foreground">
+              <h2 id="modal-title" className="text-xl font-semibold text-foreground" data-testid="modal-title">
                 Dodaj Nową Książkę
               </h2>
-              <p id="modal-description" className="text-sm text-muted-foreground mt-1">
+              <p id="modal-description" className="text-sm text-muted-foreground mt-1" data-testid="modal-description">
                 Dodaj nową książkę do swojej biblioteki w kilku prostych krokach
               </p>
             </div>
@@ -134,13 +137,14 @@ export default function AddBookModal({ isOpen, onClose, onSuccess }: AddBookModa
               onClick={handleClose}
               className="h-6 w-6 hover:bg-destructive/10 hover:text-destructive"
               aria-label="Zamknij modal"
+              data-testid="modal-close-button"
             >
               <X className="h-4 w-4" />
             </Button>
           </div>
 
           {/* Modal Body */}
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto" data-testid="modal-body">
             <AddBookWizard
               onComplete={handleWizardComplete}
               onCancel={handleWizardCancel}

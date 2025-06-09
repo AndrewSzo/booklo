@@ -4,6 +4,7 @@ import "./globals.css";
 import QueryProvider from "@/lib/providers/QueryProvider";
 import { AuthProvider } from "@/lib/providers/AuthProvider";
 import { BookDetailsProvider } from "@/lib/providers/BookDetailsContext";
+import { LibraryProvider } from "@/lib/providers/LibraryContext";
 import AuthButton from "@/components/common/AuthButton";
 import Logo from "@/components/common/Logo";
 
@@ -32,19 +33,21 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <QueryProvider>
           <AuthProvider>
-            <BookDetailsProvider>
-              <div className="min-h-screen bg-background">
-                <nav className="border-b border-border bg-card">
-                  <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-                    <Logo />
-                    <AuthButton />
-                  </div>
-                </nav>
-                <main>
-                  {children}
-                </main>
-              </div>
-            </BookDetailsProvider>
+            <LibraryProvider>
+              <BookDetailsProvider>
+                <div className="min-h-screen bg-background text-foreground">
+                  <header className="bg-white border-b sticky top-0 z-40">
+                    <div className="h-16 px-4 md:px-6 flex items-center justify-between">
+                      <Logo />
+                      <AuthButton />
+                    </div>
+                  </header>
+                  <main className="h-[calc(100vh-4rem)]">
+                    {children}
+                  </main>
+                </div>
+              </BookDetailsProvider>
+            </LibraryProvider>
           </AuthProvider>
         </QueryProvider>
       </body>

@@ -1,0 +1,9 @@
+{
+  "watch": ["features", "step_definitions", "page-objects", "support", "utils"],
+  "ext": "ts,feature",
+  "ignore": ["node_modules", "reports", "screenshots", "videos", "dist"],
+  "delay": 1000,
+  "env": {
+    "NODE_ENV": "test"
+  }
+} 

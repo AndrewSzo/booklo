@@ -12,9 +12,10 @@ export default function LoginPage() {
     <AuthCard
       title="Zaloguj się"
       description="Wprowadź swoje dane aby uzyskać dostęp do konta"
+      data-testid="login-page"
     >
       <Suspense fallback={
-        <div className="flex items-center justify-center py-8">
+        <div className="flex items-center justify-center py-8" data-testid="login-loading">
           <Loader2 className="h-6 w-6 animate-spin" />
         </div>
       }>

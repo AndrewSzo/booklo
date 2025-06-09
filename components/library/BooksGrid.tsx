@@ -16,6 +16,7 @@ interface BooksGridProps {
   className?: string
   sidebarOpen?: boolean
   leftSidebarOpen?: boolean
+  'data-testid'?: string
 }
 
 export default function BooksGrid({
@@ -28,11 +29,12 @@ export default function BooksGrid({
   onClearFilters,
   className = '',
   sidebarOpen = false,
-  leftSidebarOpen = true
+  leftSidebarOpen = true,
+  'data-testid': testId
 }: BooksGridProps) {
   // Loading state
   if (isLoading) {
-    return <LoadingGrid count={12} />
+    return <LoadingGrid count={12} data-testid="books-loading-grid" />
   }
 
   // Empty state
@@ -42,6 +44,7 @@ export default function BooksGrid({
         currentStatus={currentStatus}
         searchQuery={searchQuery}
         onClearFilters={onClearFilters}
+        data-testid="books-empty-state"
       />
     )
   }
@@ -70,13 +73,14 @@ export default function BooksGrid({
       grid gap-6 auto-rows-max
       ${getGridClasses()}
       ${className}
-    `}>
-      {books.map((book) => (
+    `} data-testid={testId || "books-grid"}>
+      {books.map((book, index) => (
         <BookCard
           key={book.id}
           book={book}
           onClick={onBookSelect}
           variant="compact"
+          data-testid={`book-card-${index}`}
         />
       ))}
     </div>

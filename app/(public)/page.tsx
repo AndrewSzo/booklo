@@ -10,7 +10,7 @@ import { NavbarComponent } from "@/components/homepage/NavbarComponent";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-green-50">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-green-50" data-testid="home-page">
       <NavbarComponent />
       <BookHeroSection />
       <FeaturesSection />

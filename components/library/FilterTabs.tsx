@@ -8,6 +8,7 @@ interface FilterTabsProps {
   activeStatus: ReadingStatus | 'all'
   onStatusChange: (status: ReadingStatus | 'all') => void
   bookCounts?: Record<ReadingStatus, number>
+  'data-testid'?: string
 }
 
 interface FilterTab {
@@ -21,7 +22,8 @@ interface FilterTab {
 export default function FilterTabs({
   activeStatus,
   onStatusChange,
-  bookCounts
+  bookCounts,
+  'data-testid': testId
 }: FilterTabsProps) {
   const tabs: FilterTab[] = [
     {
@@ -70,7 +72,7 @@ export default function FilterTabs({
   }
 
   return (
-    <div className="flex flex-wrap gap-3">
+    <div className="flex flex-wrap gap-3" data-testid={testId}>
       {tabs.map((tab) => {
         const Icon = tab.icon
         const isActive = activeStatus === tab.status
@@ -85,6 +87,7 @@ export default function FilterTabs({
               ${getColorClasses(tab.color, isActive)}
               ${isActive ? 'transform scale-105' : 'hover:scale-105'}
             `}
+            data-testid={`filter-tab-${tab.status}`}
           >
             <Icon className="h-5 w-5" />
             <span className="font-medium">{tab.label}</span>
@@ -95,7 +98,7 @@ export default function FilterTabs({
                   ? 'bg-white/20 text-white' 
                   : 'bg-gray-100 text-gray-600'
                 }
-              `}>
+              `} data-testid={`filter-tab-${tab.status}-count`}>
                 {tab.count}
               </span>
             )}
