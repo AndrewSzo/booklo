@@ -158,53 +158,59 @@ Given('I am logged in as a regular user', async function(this: ICustomWorld) {
   await this.pageFactory!.loginPage.clickLogin();
   
   // Wait for login attempt to complete
-  await this.page!.waitForTimeout(2000);
+  await this.page!.waitForTimeout(1500);
   const currentUrl = this.page!.url();
+  console.log(`URL after login attempt: ${currentUrl}`);
   
   // If still on login page, user probably doesn't exist - register them
   if (currentUrl.includes('/auth/login')) {
     console.log(`Regular user doesn't exist, registering...`);
     
-    // Go to registration page
-    const baseUrl = process.env.BASE_URL || 'http://localhost:3001';
-    await this.page!.goto(`${baseUrl}/auth/register`);
-    await this.page!.waitForLoadState('networkidle');
-    
-    // Fill registration form
-    await this.page!.locator('input[name="email"]').fill(user.email);
-    await this.page!.locator('input[name="password"]').fill(user.password);
-    
-    // Check if there's a confirm password field
-    const confirmPasswordField = this.page!.locator('input[name="confirmPassword"]');
-    if (await confirmPasswordField.isVisible()) {
-      await confirmPasswordField.fill(user.password);
-    }
-    
-    // Check if there are name fields
-    if (user.firstName) {
-      const firstNameField = this.page!.locator('[data-testid="first-name-input"]');
-      if (await firstNameField.isVisible()) {
-        await firstNameField.fill(user.firstName);
+    try {
+      // Go to registration page
+      const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+      await this.page!.goto(`${baseUrl}/auth/register`);
+      await this.page!.waitForLoadState('networkidle');
+      
+      // Fill registration form
+      await this.page!.locator('input[name="email"]').fill(user.email);
+      await this.page!.locator('input[name="password"]').fill(user.password);
+      
+      // Check if there's a confirm password field
+      const confirmPasswordField = this.page!.locator('input[name="confirmPassword"]');
+      if (await confirmPasswordField.isVisible()) {
+        await confirmPasswordField.fill(user.password);
       }
-    }
-    
-    if (user.lastName) {
-      const lastNameField = this.page!.locator('[data-testid="last-name-input"]');
-      if (await lastNameField.isVisible()) {
-        await lastNameField.fill(user.lastName);
+      
+      // Check if there are name fields
+      if (user.firstName) {
+        const firstNameField = this.page!.locator('[data-testid="first-name-input"]');
+        if (await firstNameField.isVisible()) {
+          await firstNameField.fill(user.firstName);
+        }
       }
+      
+      if (user.lastName) {
+        const lastNameField = this.page!.locator('[data-testid="last-name-input"]');
+        if (await lastNameField.isVisible()) {
+          await lastNameField.fill(user.lastName);
+        }
+      }
+      
+      // Submit registration form
+      await this.page!.locator('button[type="submit"]').click();
+      await this.page!.waitForLoadState('networkidle');
+      
+      // Wait a bit more for registration to complete
+      await this.page!.waitForTimeout(3000);
+      
+      // Now try to login again
+      await this.pageFactory!.loginPage.goto();
+      await this.pageFactory!.loginPage.login(user.email, user.password);
+    } catch (error) {
+      console.error('Error registering user:', error);
+      throw error;
     }
-    
-    // Submit registration form
-    await this.page!.locator('button[type="submit"]').click();
-    await this.page!.waitForLoadState('networkidle');
-    
-    // Wait a bit more for registration to complete
-    await this.page!.waitForTimeout(3000);
-    
-    // Now try to login again
-    await this.pageFactory!.loginPage.goto();
-    await this.pageFactory!.loginPage.login(user.email, user.password);
   }
   
   // Verify login was successful
@@ -224,53 +230,59 @@ Given('I am logged in as a {string}', async function(this: ICustomWorld, userTyp
   await this.pageFactory!.loginPage.clickLogin();
   
   // Wait for login attempt to complete
-  await this.page!.waitForTimeout(2000);
+  await this.page!.waitForTimeout(1500);
   const currentUrl = this.page!.url();
+  console.log(`URL after login attempt: ${currentUrl}`);
   
   // If still on login page, user probably doesn't exist - register them
   if (currentUrl.includes('/auth/login')) {
     console.log(`User ${userType} doesn't exist, registering...`);
     
-    // Go to registration page
-    const baseUrl = process.env.BASE_URL || 'http://localhost:3001';
-    await this.page!.goto(`${baseUrl}/auth/register`);
-    await this.page!.waitForLoadState('networkidle');
-    
-    // Fill registration form
-    await this.page!.locator('input[name="email"]').fill(user.email);
-    await this.page!.locator('input[name="password"]').fill(user.password);
-    
-    // Check if there's a confirm password field
-    const confirmPasswordField = this.page!.locator('input[name="confirmPassword"]');
-    if (await confirmPasswordField.isVisible()) {
-      await confirmPasswordField.fill(user.password);
-    }
-    
-    // Check if there are name fields
-    if (user.firstName) {
-      const firstNameField = this.page!.locator('[data-testid="first-name-input"]');
-      if (await firstNameField.isVisible()) {
-        await firstNameField.fill(user.firstName);
+    try {
+      // Go to registration page
+      const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+      await this.page!.goto(`${baseUrl}/auth/register`);
+      await this.page!.waitForLoadState('networkidle');
+      
+      // Fill registration form
+      await this.page!.locator('input[name="email"]').fill(user.email);
+      await this.page!.locator('input[name="password"]').fill(user.password);
+      
+      // Check if there's a confirm password field
+      const confirmPasswordField = this.page!.locator('input[name="confirmPassword"]');
+      if (await confirmPasswordField.isVisible()) {
+        await confirmPasswordField.fill(user.password);
       }
-    }
-    
-    if (user.lastName) {
-      const lastNameField = this.page!.locator('[data-testid="last-name-input"]');
-      if (await lastNameField.isVisible()) {
-        await lastNameField.fill(user.lastName);
+      
+      // Check if there are name fields
+      if (user.firstName) {
+        const firstNameField = this.page!.locator('[data-testid="first-name-input"]');
+        if (await firstNameField.isVisible()) {
+          await firstNameField.fill(user.firstName);
+        }
       }
+      
+      if (user.lastName) {
+        const lastNameField = this.page!.locator('[data-testid="last-name-input"]');
+        if (await lastNameField.isVisible()) {
+          await lastNameField.fill(user.lastName);
+        }
+      }
+      
+      // Submit registration form
+      await this.page!.locator('button[type="submit"]').click();
+      await this.page!.waitForLoadState('networkidle');
+      
+      // Wait a bit more for registration to complete
+      await this.page!.waitForTimeout(3000);
+      
+      // Now try to login again
+      await this.pageFactory!.loginPage.goto();
+      await this.pageFactory!.loginPage.login(user.email, user.password);
+    } catch (error) {
+      console.error('Error registering user:', error);
+      throw error;
     }
-    
-    // Submit registration form
-    await this.page!.locator('button[type="submit"]').click();
-    await this.page!.waitForLoadState('networkidle');
-    
-    // Wait a bit more for registration to complete
-    await this.page!.waitForTimeout(3000);
-    
-    // Now try to login again
-    await this.pageFactory!.loginPage.goto();
-    await this.pageFactory!.loginPage.login(user.email, user.password);
   }
   
   // Verify login was successful
@@ -402,7 +414,7 @@ Then('I should be logged out', async function(this: ICustomWorld) {
 
 Then('I should be redirected to the home page', async function(this: ICustomWorld) {
   const currentUrl = this.page!.url();
-  const baseUrl = process.env.BASE_URL || 'http://localhost:3001';
+  const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
   expect(currentUrl).toBe(baseUrl + '/');
 });
 
@@ -418,7 +430,7 @@ Given('I am not logged in', async function(this: ICustomWorld) {
 
 When('I attempt to access a protected page', async function(this: ICustomWorld) {
   // Try to access library page directly
-  await this.page!.goto(`${process.env.BASE_URL || 'http://localhost:3001'}/library`);
+  await this.page!.goto(`${process.env.BASE_URL || 'http://localhost:3000'}/library`);
 });
 
 Then('I should be redirected to the login page', async function(this: ICustomWorld) {

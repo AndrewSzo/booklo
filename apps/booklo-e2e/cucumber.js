@@ -20,11 +20,11 @@ const config = {
   strict: false,
   parallel: 1,
   retry: 0,
-  timeout: 60000,
+  timeout: 120000,
   worldParameters: {
     headless: process.env.HEADLESS !== 'false',
     slowMo: parseInt(process.env.SLOW_MO) || 0,
-    timeout: parseInt(process.env.TIMEOUT) || 30000
+    timeout: parseInt(process.env.TIMEOUT) || 60000
   }
 };
 

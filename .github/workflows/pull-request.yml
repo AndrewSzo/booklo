@@ -79,6 +79,7 @@ jobs:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
       NEXT_PUBLIC_SITE_URL: http://localhost:3000
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       REPORT_PATH: ./reports
       SCREENSHOT_PATH: ./screenshots
     steps:
@@ -96,11 +97,18 @@ jobs:
 
       - name: Build Next.js application
         run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_SITE_URL: http://localhost:3000
 
       - name: Start Next.js application
         run: npm start &
         env:
           PORT: 3000
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_SITE_URL: http://localhost:3000
 
       - name: Wait for application to be ready
         run: |

@@ -137,7 +137,7 @@ export class CustomWorld extends World implements ICustomWorld {
       // Go to library page if not already there
       const currentUrl = this.page.url();
       if (!currentUrl.includes('/library')) {
-        await this.page.goto(`${process.env.BASE_URL || 'http://localhost:3001'}/library`);
+        await this.page.goto(`${process.env.BASE_URL || 'http://localhost:3000'}/library`);
         await this.page.waitForLoadState('networkidle');
       }
 
