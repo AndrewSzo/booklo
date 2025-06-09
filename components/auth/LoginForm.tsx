@@ -51,11 +51,11 @@ export default function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      {authError && <AuthError message={authError} />}
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" data-testid="login-form">
+      {authError && <AuthError message={authError} data-testid="auth-error" />}
       
       {redirectTo && (
-        <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 text-sm text-emerald-800">
+        <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 text-sm text-emerald-800" data-testid="redirect-notice">
           <div className="flex items-center space-x-2">
             <div className="w-4 h-4 bg-emerald-500 rounded-full flex-shrink-0"></div>
             <span>Zaloguj się, aby uzyskać dostęp do tej strony</span>
@@ -76,9 +76,10 @@ export default function LoginForm() {
               : 'border-gray-200 focus:border-emerald-500 focus:ring-emerald-500/20'
           }`}
           disabled={isPending}
+          data-testid="email-input"
         />
         {errors.email && (
-          <p className="text-sm text-red-600 flex items-center space-x-1">
+          <p className="text-sm text-red-600 flex items-center space-x-1" data-testid="email-error">
             <span className="w-1 h-1 bg-red-600 rounded-full"></span>
             <span>{errors.email.message}</span>
           </p>
@@ -99,6 +100,7 @@ export default function LoginForm() {
                 : 'border-gray-200 focus:border-emerald-500 focus:ring-emerald-500/20'
             }`}
             disabled={isPending}
+            data-testid="password-input"
           />
           <Button
             type="button"
@@ -107,6 +109,7 @@ export default function LoginForm() {
             className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-emerald-50 text-gray-500 hover:text-emerald-600"
             onClick={() => setShowPassword(!showPassword)}
             disabled={isPending}
+            data-testid="password-toggle"
           >
             {showPassword ? (
               <EyeOff className="h-4 w-4" />
@@ -116,7 +119,7 @@ export default function LoginForm() {
           </Button>
         </div>
         {errors.password && (
-          <p className="text-sm text-red-600 flex items-center space-x-1">
+          <p className="text-sm text-red-600 flex items-center space-x-1" data-testid="password-error">
             <span className="w-1 h-1 bg-red-600 rounded-full"></span>
             <span>{errors.password.message}</span>
           </p>
@@ -127,6 +130,7 @@ export default function LoginForm() {
         <Link
           href="/auth/reset-password"
           className="text-sm text-gray-600 hover:text-emerald-600 underline-offset-4 hover:underline transition-colors duration-200"
+          data-testid="forgot-password-link"
         >
           Zapomniałeś hasła?
         </Link>
@@ -136,6 +140,7 @@ export default function LoginForm() {
         type="submit" 
         className="w-full bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]" 
         disabled={isPending}
+        data-testid="login-submit-button"
       >
         {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         {isPending ? 'Logowanie...' : 'Zaloguj się'}
@@ -147,6 +152,7 @@ export default function LoginForm() {
           <Link
             href="/auth/register"
             className="text-emerald-600 hover:text-emerald-700 underline-offset-4 hover:underline font-medium transition-colors duration-200"
+            data-testid="signup-link"
           >
             Zarejestruj się
           </Link>

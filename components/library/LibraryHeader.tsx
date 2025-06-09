@@ -36,7 +36,7 @@ export default function LibraryHeader({
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8" data-testid="library-header">
       {/* Title and Add Button */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-4">
@@ -47,20 +47,21 @@ export default function LibraryHeader({
               size="sm"
               onClick={toggleLeftSidebar}
               className="p-2 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50"
+              data-testid="sidebar-menu-button"
             >
               <Menu className="h-5 w-5" />
             </Button>
           )}
           
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4" data-testid="library-title-section">
             <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-green-500 rounded-xl flex items-center justify-center shadow-lg">
               <BookOpen className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent" data-testid="library-title">
                 Moja Biblioteka
               </h1>
-              <p className="text-gray-600 mt-1">
+              <p className="text-gray-600 mt-1" data-testid="library-subtitle">
                 Zarządzaj i odkrywaj swoją kolekcję książek
               </p>
             </div>
@@ -70,6 +71,7 @@ export default function LibraryHeader({
         <Button 
           onClick={() => setIsAddModalOpen(true)}
           className="shrink-0 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+          data-testid="add-book-button"
         >
           <Plus className="h-4 w-4 mr-2" />
           Dodaj Książkę
@@ -77,17 +79,19 @@ export default function LibraryHeader({
       </div>
 
       {/* Filters and Search */}
-      <div className="space-y-6">
+      <div className="space-y-6" data-testid="library-controls">
         <FilterTabs
           activeStatus={currentStatus}
           onStatusChange={onStatusChange}
           bookCounts={bookCounts}
+          data-testid="filter-tabs"
         />
         
         <SearchBar
           value={searchQuery}
           placeholder="Szukaj książek po tytule, autorze lub opisie..."
           onSearch={onSearchChange}
+          data-testid="search-bar"
         />
       </div>
 
@@ -96,6 +100,7 @@ export default function LibraryHeader({
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onSuccess={handleBookAdded}
+        data-testid="add-book-modal"
       />
     </div>
   )

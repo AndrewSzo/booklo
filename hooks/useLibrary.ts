@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
+import { useLibraryContext } from '@/lib/providers/LibraryContext'
 import { 
   BookListItemDTO, 
   ReadingStatus, 
@@ -128,6 +129,7 @@ export function useLibrary(): UseLibraryReturn {
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
+  const { setRefetchFunction } = useLibraryContext()
   
   const [selectedBookId, setSelectedBookId] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -272,6 +274,11 @@ export function useLibrary(): UseLibraryReturn {
     await fetchBooks(1, false)
     await loadBookCounts()
   }
+
+  // Register refetch function in context
+  useEffect(() => {
+    setRefetchFunction(refetch)
+  }, [setRefetchFunction, refetch])
 
   const state: LibraryViewState = {
     books,

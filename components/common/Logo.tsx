@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { BookOpen } from 'lucide-react'
 import { useAuth } from '@/lib/providers/AuthProvider'
 
 export default function Logo() {
@@ -11,11 +12,10 @@ export default function Logo() {
   return (
     <Link 
       href={href}
-      className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+      className="flex items-center space-x-2 text-emerald-700 hover:text-emerald-800 transition-colors"
     >
-      <h1 className="text-xl font-bold text-foreground">
-        📚 Booklo
-      </h1>
+      <BookOpen className="w-8 h-8" />
+      <span className="text-xl font-bold">Booklo</span>
     </Link>
   )
 } 

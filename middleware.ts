@@ -34,9 +34,26 @@ export async function middleware(request: NextRequest) {
   // supabase.auth.getUser(). A simple mistake could make it very hard to debug
   // issues with users being randomly logged out.
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  let user = null
+  let supabaseConnectionFailed = false
+  
+  try {
+    // Add timeout to avoid hanging middleware
+    const userPromise = supabase.auth.getUser()
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Supabase request timeout')), 3000)
+    )
+    
+    const {
+      data: { user: authUser },
+    } = await Promise.race([userPromise, timeoutPromise]) as any
+    user = authUser
+  } catch (error) {
+    // If Supabase is not available, log the error but don't crash
+    console.warn('Supabase connection failed in middleware:', error)
+    supabaseConnectionFailed = true
+    // When Supabase is unavailable, we allow access to avoid blocking the app
+  }
 
   const url = request.nextUrl.clone()
   const pathname = url.pathname
@@ -56,20 +73,23 @@ export async function middleware(request: NextRequest) {
   // Check if current path is auth route
   const isAuthRoute = pathname.startsWith('/auth/')
 
-  // Redirect logic
-  if (isProtectedRoute && !user) {
-    // Redirect unauthenticated users to login
-    url.pathname = '/auth/login'
-    url.searchParams.set('redirectTo', pathname)
-    return NextResponse.redirect(url)
-  }
+  // Only apply auth logic if Supabase connection is working
+  if (!supabaseConnectionFailed) {
+    // Redirect logic - only when we have a working Supabase connection
+    if (isProtectedRoute && !user) {
+      // Redirect unauthenticated users to login
+      url.pathname = '/auth/login'
+      url.searchParams.set('redirectTo', pathname)
+      return NextResponse.redirect(url)
+    }
 
-  if (isAuthRoute && user) {
-    // Redirect authenticated users away from auth pages
-    const redirectTo = url.searchParams.get('redirectTo') || '/dashboard'
-    url.pathname = redirectTo
-    url.searchParams.delete('redirectTo')
-    return NextResponse.redirect(url)
+    if (isAuthRoute && user) {
+      // Redirect authenticated users away from auth pages
+      const redirectTo = url.searchParams.get('redirectTo') || '/dashboard'
+      url.pathname = redirectTo
+      url.searchParams.delete('redirectTo')
+      return NextResponse.redirect(url)
+    }
   }
 
   // Handle auth callback

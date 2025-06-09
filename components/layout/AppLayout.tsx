@@ -26,7 +26,7 @@ export function AppLayout({
   })
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-emerald-50 via-white to-green-50">
+    <div className="flex h-screen bg-gradient-to-br from-emerald-50 via-white to-green-50" data-testid="app-layout">
       {/* Left Sidebar - Navigation */}
       <div 
         className={`
@@ -37,6 +37,7 @@ export function AppLayout({
           ${layoutState.leftSidebarOpen ? 'border-r border-emerald-100 shadow-lg' : ''}
           overflow-hidden
         `}
+        data-testid="left-sidebar-container"
       >
         <LeftSidebar 
           isOpen={layoutState.leftSidebarOpen}
@@ -50,13 +51,14 @@ export function AppLayout({
         <div 
           className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
           onClick={toggleLeftSidebar}
+          data-testid="mobile-sidebar-overlay"
         />
       )}
 
       {/* Main Content Area */}
-      <div className="flex-1 flex min-w-0 h-full">
+      <div className="flex-1 flex min-w-0 h-full" data-testid="main-content-area">
         {/* Main Content */}
-        <main className="flex-1 min-w-0 h-full overflow-hidden bg-white/50 backdrop-blur-sm">
+        <main className="flex-1 min-w-0 h-full overflow-hidden bg-white/50 backdrop-blur-sm" data-testid="main-content">
           {children}
         </main>
 

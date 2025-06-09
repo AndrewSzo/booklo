@@ -1,0 +1,184 @@
+name: Pull Request CI
+
+on:
+  pull_request:
+    branches: [ main ]
+    types: [ opened, synchronize, reopened ]
+
+jobs:
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests with coverage
+        run: npm run test:coverage
+
+      - name: Upload unit test coverage
+        uses: codecov/codecov-action@v5
+        with:
+          file: ./coverage/lcov.info
+          flags: unit
+          name: unit-tests
+          fail_ci_if_error: false
+
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    environment: integration
+    env:
+      BASE_URL: ${{ secrets.BASE_URL }}
+      API_URL: ${{ secrets.API_URL }}
+      HEADLESS: true
+      SLOW_MO: 0
+      TIMEOUT: 30000
+      BROWSER: chromium
+      TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
+      TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+      ADMIN_USER_EMAIL: ${{ secrets.ADMIN_USER_EMAIL }}
+      ADMIN_USER_PASSWORD: ${{ secrets.ADMIN_USER_PASSWORD }}
+      INACTIVE_USER_EMAIL: ${{ secrets.INACTIVE_USER_EMAIL }}
+      INACTIVE_USER_PASSWORD: ${{ secrets.INACTIVE_USER_PASSWORD }}
+      LIBRARY_USER_EMAIL: ${{ secrets.LIBRARY_USER_EMAIL }}
+      LIBRARY_USER_PASSWORD: ${{ secrets.LIBRARY_USER_PASSWORD }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      REPORT_PATH: ./reports
+      SCREENSHOT_PATH: ./screenshots
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install main dependencies
+        run: npm ci
+
+      - name: Install E2E dependencies
+        run: cd apps/booklo-e2e && npm ci
+
+      - name: Install Playwright browsers
+        run: cd apps/booklo-e2e && npx playwright install chromium firefox webkit
+
+      - name: Run E2E tests
+        run: npm run test:e2e:headless
+
+      - name: Upload E2E test artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-test-results
+          path: |
+            apps/booklo-e2e/reports/
+            apps/booklo-e2e/screenshots/
+            apps/booklo-e2e/videos/
+          retention-days: 7
+
+  status-comment:
+    name: Status Comment
+    runs-on: ubuntu-latest
+    needs: [lint, unit-tests, e2e-tests]
+    if: always() && github.event_name == 'pull_request'
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Comment PR Status
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+
+            const lintStatus = '${{ needs.lint.result }}';
+            const unitTestsStatus = '${{ needs.unit-tests.result }}';
+            const e2eTestsStatus = '${{ needs.e2e-tests.result }}';
+
+            const statusEmoji = {
+              'success': '✅',
+              'failure': '❌',
+              'cancelled': '⏹️',
+              'skipped': '⏭️'
+            };
+
+            const overallStatus = [lintStatus, unitTestsStatus, e2eTestsStatus].every(status => status === 'success') ? 'success' : 'failure';
+
+            const comment = `## 🔍 Pull Request Check Results
+
+            ### Job Status Summary
+            - **Lint**: ${statusEmoji[lintStatus] || '❓'} ${lintStatus}
+            - **Unit Tests**: ${statusEmoji[unitTestsStatus] || '❓'} ${unitTestsStatus}
+            - **E2E Tests**: ${statusEmoji[e2eTestsStatus] || '❓'} ${e2eTestsStatus}
+
+            ### Overall Status: ${statusEmoji[overallStatus] || '❓'} ${overallStatus === 'success' ? 'All checks passed!' : 'Some checks failed'}
+
+            ---
+            📊 **Branch**: \`${pr.head.ref}\`
+            🔗 **Commit**: \`${pr.head.sha.substring(0, 7)}\`
+            ⏰ **Time**: ${new Date().toLocaleString()}`;
+
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const existingComment = comments.find(comment => 
+              comment.user.type === 'Bot' && comment.body.includes('🔍 Pull Request Check Results')
+            );
+
+            if (existingComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingComment.id,
+                body: comment
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment
+              });
+            } 

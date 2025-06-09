@@ -58,7 +58,7 @@ export default function LibraryView() {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full" data-testid="library-view">
       <div className="flex-1 overflow-y-auto">
         <div className="p-4 md:p-6 space-y-6">
           <LibraryHeader
@@ -71,15 +71,16 @@ export default function LibraryView() {
           />
           
           {state.error ? (
-            <div className="flex items-center justify-center py-16">
+            <div className="flex items-center justify-center py-16" data-testid="library-error">
               <div className="text-center space-y-4">
-                <div className="text-destructive text-lg font-medium">
+                <div className="text-destructive text-lg font-medium" data-testid="error-title">
                   Błąd podczas ładowania książek
                 </div>
-                <p className="text-muted-foreground">{state.error}</p>
+                <p className="text-muted-foreground" data-testid="error-message">{state.error}</p>
                 <button 
                   onClick={actions.refetch}
                   className="text-primary hover:underline"
+                  data-testid="retry-button"
                 >
                   Spróbuj ponownie
                 </button>
@@ -97,6 +98,7 @@ export default function LibraryView() {
                 onClearFilters={handleClearFilters}
                 sidebarOpen={sidebarOpen}
                 leftSidebarOpen={layoutState.leftSidebarOpen}
+                data-testid="library-books-grid"
               />
               
               {state.hasNextPage && (
@@ -104,6 +106,7 @@ export default function LibraryView() {
                   hasNextPage={state.hasNextPage}
                   isLoading={state.isLoadingMore}
                   onLoadMore={actions.loadMore}
+                  data-testid="load-more-button"
                 />
               )}
             </>

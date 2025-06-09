@@ -10,6 +10,7 @@ interface EmptyStateProps {
   onAddBook?: () => void
   onClearFilters?: () => void
   className?: string
+  'data-testid'?: string
 }
 
 export default function EmptyState({ 
@@ -17,7 +18,8 @@ export default function EmptyState({
   searchQuery = '',
   onAddBook,
   onClearFilters,
-  className = '' 
+  className = '',
+  'data-testid': testId
 }: EmptyStateProps) {
   
   const handleAddBook = () => {
@@ -131,22 +133,23 @@ export default function EmptyState({
   const Icon = content.icon
 
   return (
-    <div className={`flex flex-col items-center justify-center py-16 px-6 ${className}`}>
-      <div className="w-24 h-24 mb-6 bg-muted rounded-full flex items-center justify-center">
+    <div className={`flex flex-col items-center justify-center py-16 px-6 ${className}`} data-testid={testId}>
+      <div className="w-24 h-24 mb-6 bg-muted rounded-full flex items-center justify-center" data-testid="empty-state-icon">
         <Icon className="h-12 w-12 text-muted-foreground" />
       </div>
       
       <div className="text-center space-y-4 max-w-md">
-        <h3 className="text-xl font-semibold text-foreground">{content.title}</h3>
-        <p className="text-muted-foreground">
+        <h3 className="text-xl font-semibold text-foreground" data-testid="empty-state-title">{content.title}</h3>
+        <p className="text-muted-foreground" data-testid="empty-state-description">
           {content.description}
         </p>
         
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+        <div className="flex flex-col sm:flex-row gap-3 justify-center" data-testid="empty-state-actions">
           <Button 
             onClick={content.primaryAction.action} 
             variant={content.primaryAction.variant}
             className="gap-2"
+            data-testid="empty-state-primary-action"
           >
             {content.primaryAction.label.includes('Dodaj') && <Plus className="h-4 w-4" />}
             {content.primaryAction.label.includes('Wyczyść') && <Filter className="h-4 w-4" />}
@@ -156,6 +159,7 @@ export default function EmptyState({
           <Button 
             onClick={content.secondaryAction.action}
             variant={content.secondaryAction.variant}
+            data-testid="empty-state-secondary-action"
           >
             {content.secondaryAction.label}
           </Button>

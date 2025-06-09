@@ -4,6 +4,7 @@ import React, { useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { cn } from '@/lib/utils'
 import { useBookDetailsContext } from '@/lib/providers/BookDetailsContext'
+import { useLibraryContext } from '@/lib/providers/LibraryContext'
 import type { BookDetailsSidebarProps } from './types'
 import type { BookDetailDTO, ReadingStatus } from '@/lib/types'
 import { SidebarHeader } from './SidebarHeader'
@@ -27,6 +28,7 @@ export function BookDetailsSidebar({
   className 
 }: BookDetailsSidebarProps) {
   const { activeTab, setActiveTab, closeSidebar } = useBookDetailsContext()
+  const { refetchLibrary } = useLibraryContext()
   const queryClient = useQueryClient()
 
   // Fetch book details when bookId changes
@@ -55,20 +57,20 @@ export function BookDetailsSidebar({
       }
     })
     
-    // Also invalidate library queries to refresh the main list
-    queryClient.invalidateQueries({ queryKey: ['library'] })
+    // Refresh library using LibraryContext
+    refetchLibrary()
   }
 
   // Handle book delete - close sidebar and refresh library
-  const handleBookDelete = (deletedBookId: string) => {
+  const handleBookDelete = async (deletedBookId: string) => {
     // Close sidebar
     closeSidebar()
     
     // Remove from cache
     queryClient.removeQueries({ queryKey: ['books', deletedBookId] })
     
-    // Refresh library to remove deleted book
-    queryClient.invalidateQueries({ queryKey: ['library'] })
+    // Refresh library using LibraryContext instead of React Query invalidation
+    await refetchLibrary()
   }
 
   // Handle status change

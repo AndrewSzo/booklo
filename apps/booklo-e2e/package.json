@@ -1,0 +1,48 @@
+{
+  "name": "booklo-web-e2e",
+  "version": "1.0.0",
+  "description": "End-to-end tests for Booklo web application using Playwright and Cucumber",
+  "scripts": {
+    "test": "cucumber-js",
+    "test:headless": "HEADLESS=true cucumber-js",
+    "test:headed": "HEADLESS=false cucumber-js",
+    "test:debug": "DEBUG=true HEADLESS=false cucumber-js",
+    "test:chrome": "BROWSER=chromium cucumber-js",
+    "test:firefox": "BROWSER=firefox cucumber-js",
+    "test:webkit": "BROWSER=webkit cucumber-js",
+    "test:parallel": "cucumber-js --parallel 2",
+    "test:tag": "cucumber-js --tags",
+    "test:dry-run": "cucumber-js --dry-run",
+    "test:watch": "nodemon --exec \"cucumber-js\"",
+    "test:watch:headed": "nodemon --exec \"HEADLESS=false cucumber-js\"",
+    "install-browsers": "playwright install",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "clean": "rm -rf reports screenshots videos dist",
+    "setup": "npm run install-browsers && npm run clean"
+  },
+  "keywords": [
+    "e2e",
+    "testing",
+    "playwright",
+    "cucumber",
+    "gherkin",
+    "automation"
+  ],
+  "author": "Booklo Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@cucumber/cucumber": "^10.0.0",
+    "@cucumber/pretty-formatter": "^1.0.0",
+    "@playwright/test": "^1.40.0",
+    "@types/cucumber": "^6.0.1",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "dotenv": "^16.0.0",
+    "eslint": "^8.0.0",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.0.0",
+    "typescript": "^5.0.0"
+  }
+}
