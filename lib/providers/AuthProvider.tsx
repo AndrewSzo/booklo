@@ -20,9 +20,19 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const supabase = createClient()
+  
+  // Check if Supabase environment variables are available
+  const hasSupabaseConfig = 
+    typeof window !== 'undefined' && 
+    process.env.NEXT_PUBLIC_SUPABASE_URL && 
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  // Only create Supabase client if config is available and we're on the client side
+  const supabase = hasSupabaseConfig ? createClient() : null
 
   const refreshUser = async () => {
+    if (!supabase) return
+    
     try {
       const { data: { user } } = await supabase.auth.getUser()
       setUser(user)
@@ -33,6 +43,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signOut = async () => {
+    if (!supabase) return
+    
     try {
       const { error } = await supabase.auth.signOut()
       if (error) {
@@ -45,6 +57,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   useEffect(() => {
+    if (!supabase) {
+      setIsLoading(false)
+      return
+    }
+
     // Get initial session
     const getInitialSession = async () => {
       try {
@@ -78,7 +95,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     )
 
     return () => subscription.unsubscribe()
-  }, [supabase.auth, refreshUser])
+  }, [supabase, refreshUser])
 
   const value: AuthContextType = {
     user,
