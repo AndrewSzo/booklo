@@ -3,10 +3,7 @@
 import { useDashboardData } from '@/hooks/useDashboardData'
 import WelcomeHeader from './WelcomeHeader'
 import StatsCardsGrid from './StatsCardsGrid'
-import QuickActionsPanel from './QuickActionsPanel'
-import RecentBooksSection from './RecentBooksSection'
-import ReadingProgressSection from './ReadingProgressSection'
-import { AiChatDialog } from '@/components/ai-chat/AiChatDialog'
+import CurrentlyReadingSection from './CurrentlyReadingSection'
 
 export default function DashboardContent() {
   const { dashboardData } = useDashboardData()
@@ -56,45 +53,14 @@ export default function DashboardContent() {
         }}
       />
       
-      <QuickActionsPanel 
-        actions={[
-          { id: 'add-book', label: 'Dodaj książkę', icon: 'Plus', variant: 'primary' },
-          { id: 'search', label: 'Szukaj', icon: 'Search', variant: 'secondary' },
-        ]}
-        onActionClick={(actionId) => {
-          if (actionId === 'add-book') {
-            // Otwórz modal dodawania książki
-            console.log('Opening add book modal')
-          } else if (actionId === 'search') {
-            // Przejdź do search
-            window.location.href = '/search'
-          }
+      <CurrentlyReadingSection 
+        books={dashboardData.currentlyReading}
+        isLoading={dashboardData.isLoading}
+        onBookClick={(book) => {
+          // Otwórz szczegóły w prawym sidebarze
+          console.log('Opening book details', book)
         }}
       />
-
-      {/* AI Chat Section */}
-      <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold text-foreground">AI Assistant</h2>
-        <AiChatDialog 
-          context={`User has ${(dashboardData.stats?.want_to_read_count || 0) + (dashboardData.stats?.reading_count || 0) + (dashboardData.stats?.finished_count || 0)} books in library. Currently reading: ${dashboardData.stats?.reading_count || 0} books.`}
-        />
-      </div>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <RecentBooksSection 
-          books={dashboardData.recentBooks}
-          isLoading={dashboardData.isLoading}
-          onBookClick={(book) => {
-            // Otwórz szczegóły w prawym sidebarze
-            console.log('Opening book details', book)
-          }}
-        />
-        
-        <ReadingProgressSection 
-          books={dashboardData.currentlyReading}
-          isLoading={dashboardData.isLoading}
-        />
-      </div>
     </div>
   )
 } 

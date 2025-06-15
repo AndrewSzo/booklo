@@ -22,7 +22,7 @@ type DBTag = Database['public']['Tables']['tags']['Row']
 // Common types
 export type ReadingStatus = 'want_to_read' | 'reading' | 'finished'
 
-export type SortField = 'title' | 'author' | 'created_at' | 'rating'
+export type SortField = 'title' | 'author' | 'created_at' | 'updated_at' | 'rating'
 export type SortOrder = 'asc' | 'desc'
 
 // Pagination DTO
@@ -63,6 +63,7 @@ export interface UserBookStatusDTO {
 
 // Books DTOs
 export interface BookListItemDTO extends Pick<DBBook, 'id' | 'title' | 'author' | 'isbn' | 'cover_url' | 'description' | 'created_at' | 'updated_at'> {
+  category: string | null
   user_status: UserBookStatusDTO | null
   user_rating: number | null
   tags: string[]
@@ -82,6 +83,7 @@ export interface CreateBookDTO {
   cover_url?: string
   description?: string
   status?: ReadingStatus
+  category?: string
   rating?: number
   tags?: string[]
 }
@@ -94,6 +96,7 @@ export interface CreateBookResponseDTO {
 }
 
 export interface BookDetailDTO extends Pick<DBBook, 'id' | 'title' | 'author' | 'isbn' | 'cover_url' | 'description' | 'created_at' | 'updated_at'> {
+  category: string | null
   user_status: UserBookStatusDTO | null
   user_rating: number | null
   tags: string[]
@@ -107,10 +110,14 @@ export interface BookDetailResponseDTO {
 }
 
 // Partial type for book updates
-export type UpdateBookDTO = Pick<DBBookUpdate, 'title' | 'author' | 'isbn' | 'cover_url' | 'description'>
+export type UpdateBookDTO = Pick<DBBookUpdate, 'title' | 'author' | 'isbn' | 'cover_url' | 'description'> & {
+  category?: string | null
+}
 
 export interface UpdateBookResponseDTO {
-  data: Pick<DBBook, 'id' | 'title' | 'author' | 'isbn' | 'cover_url' | 'description' | 'updated_at'>
+  data: Pick<DBBook, 'id' | 'title' | 'author' | 'isbn' | 'cover_url' | 'description' | 'updated_at'> & {
+    category: string | null
+  }
 }
 
 // Book Status DTOs

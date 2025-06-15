@@ -38,6 +38,7 @@ const getInitialFormData = (): AddBookFormData => ({
   },
   categorization: {
     status: 'want_to_read',
+    category: undefined,
     tags: []
   },
   review: {

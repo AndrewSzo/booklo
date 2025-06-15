@@ -131,7 +131,7 @@ export function validateBookQuery(params: Record<string, string | null>): BookQu
   }
 
   // Validate sort field
-  const validSortFields: SortField[] = ['title', 'author', 'created_at', 'rating']
+  const validSortFields: SortField[] = ['title', 'author', 'created_at', 'updated_at', 'rating']
   let sort: SortField = 'created_at'
   if (params.sort) {
     if (!validSortFields.includes(params.sort as SortField)) {
@@ -238,6 +238,12 @@ export const updateBookSchema = z.object({
     .max(2000, 'Description must be less than 2000 characters')
     .trim()
     .nullable()
+    .optional(),
+  
+  category: z.string()
+    .max(100, 'Category must be less than 100 characters')
+    .trim()
+    .nullable()
     .optional()
 }).refine(
   (data) => Object.keys(data).length > 0,
@@ -297,6 +303,10 @@ export function validateUpdateBook(data: unknown) {
   
   if (result.data.description !== undefined) {
     transformedData.description = result.data.description
+  }
+  
+  if (result.data.category !== undefined) {
+    transformedData.category = result.data.category
   }
   
   return {

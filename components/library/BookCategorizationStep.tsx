@@ -5,6 +5,7 @@ import { BookCategorization, ValidationErrors } from './types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { X, Plus, BookOpen, Clock, CheckCircle2 } from 'lucide-react'
 
 interface BookCategorizationStepProps {
@@ -23,6 +24,21 @@ export default function BookCategorizationStep({ data, onChange, errors }: BookC
   const [tagInput, setTagInput] = useState('')
   const [tagSuggestions, setTagSuggestions] = useState<TagSuggestion[]>([])
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false)
+
+  const bookCategories = [
+    { value: 'rozwoj-osobisty', label: 'Rozwój osobisty' },
+    { value: 'sci-fi', label: 'Science Fiction' },
+    { value: 'fantasy', label: 'Fantasy' },
+    { value: 'kryminal', label: 'Kryminał' },
+    { value: 'romans', label: 'Romans' },
+    { value: 'biografie', label: 'Biografie' },
+    { value: 'biznes', label: 'Biznes' },
+    { value: 'historia', label: 'Historia' },
+    { value: 'klasyka', label: 'Klasyka' },
+    { value: 'thriller', label: 'Thriller' },
+    { value: 'psychologia', label: 'Psychologia' },
+    { value: 'sport', label: 'Sport' }
+  ]
 
   const statusOptions = [
     {
@@ -80,6 +96,13 @@ export default function BookCategorizationStep({ data, onChange, errors }: BookC
     onChange({
       ...data,
       status
+    })
+  }
+
+  const handleCategoryChange = (category: string) => {
+    onChange({
+      ...data,
+      category: category === 'none' ? undefined : category
     })
   }
 
@@ -180,6 +203,35 @@ export default function BookCategorizationStep({ data, onChange, errors }: BookC
               )
             })}
           </div>
+        </div>
+
+        {/* Category Selection */}
+        <div className="space-y-3">
+          <Label className="text-sm font-medium">
+            Kategoria (Opcjonalna)
+          </Label>
+          
+          <Select value={data.category || 'none'} onValueChange={handleCategoryChange}>
+            <SelectTrigger className={getFieldError('category') ? 'border-destructive focus:border-destructive' : ''}>
+              <SelectValue placeholder="Wybierz kategorię książki" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">Brak kategorii</SelectItem>
+              {bookCategories.map((category) => (
+                <SelectItem key={category.value} value={category.value}>
+                  {category.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {getFieldError('category') && (
+            <p className="text-sm text-destructive">{getFieldError('category')}</p>
+          )}
+
+          <p className="text-xs text-muted-foreground">
+            Wybierz gatunek lub kategorię książki, aby ułatwić organizację biblioteki.
+          </p>
         </div>
 
         {/* Tags Section */}

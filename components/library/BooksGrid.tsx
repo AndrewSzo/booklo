@@ -51,26 +51,25 @@ export default function BooksGrid({
 
   // Calculate grid columns based on both sidebars
   const getGridClasses = () => {
-    // If right sidebar is open, use standard 2-column layout
+    // If right sidebar is open, use standard layout with fewer columns
     if (sidebarOpen) {
-      return 'grid-cols-1 sm:grid-cols-2'
+      return 'grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2'
     }
     
-    // If right sidebar is closed, use fewer columns to make cards 30% wider
-    // This reduces column count to make each card take more space
+    // If right sidebar is closed, use more columns for better space utilization
     if (!leftSidebarOpen) {
-      // When both sidebars closed, moderate number of columns for wider cards
-      return 'grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+      // When both sidebars closed, maximize columns for full width
+      return 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'
     }
     
-    // If left sidebar is open but right is closed, use fewer columns for wider cards
-    return 'grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3'
+    // If left sidebar is open but right is closed, balanced layout
+    return 'grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
   }
 
   // Books grid with intelligent layout
   return (
     <div className={`
-      grid gap-6 auto-rows-max
+      grid gap-4 sm:gap-5 md:gap-6 lg:gap-7 xl:gap-8 auto-rows-max
       ${getGridClasses()}
       ${className}
     `} data-testid={testId || "books-grid"}>

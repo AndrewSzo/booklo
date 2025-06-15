@@ -100,7 +100,7 @@ export class BookService {
       const { data, error } = await this.supabase
         .from('books')
         .insert(bookInsert)
-        .select('id, title, author, isbn, cover_url, description, created_at, updated_at')
+        .select('id, title, author, isbn, cover_url, description, category, created_at, updated_at')
         .single()
 
       if (error) {
@@ -255,6 +255,7 @@ export class BookService {
           isbn,
           cover_url,
           description,
+          category,
           created_at,
           updated_at
         `)
@@ -459,6 +460,7 @@ export class BookService {
             isbn: book.isbn,
             cover_url: book.cover_url,
             description: book.description,
+            category: book.category,
             created_at: book.created_at,
             updated_at: book.updated_at,
             user_status: userStatus ? {
@@ -510,7 +512,7 @@ export class BookService {
       // Step 1: Get basic book information
       const { data: book, error: bookError } = await this.supabase
         .from('books')
-        .select('id, title, author, isbn, cover_url, description, created_at, updated_at')
+        .select('id, title, author, isbn, cover_url, description, category, created_at, updated_at')
         .eq('id', bookId)
         .maybeSingle()
 
@@ -586,6 +588,7 @@ export class BookService {
         isbn: book.isbn,
         cover_url: book.cover_url,
         description: book.description,
+        category: book.category,
         created_at: book.created_at,
         updated_at: book.updated_at,
         user_status: userStatus ? {
@@ -616,7 +619,7 @@ export class BookService {
     bookId: string,
     userId: string,
     updateData: UpdateBookDTO
-  ): Promise<{ id: string; title: string; author: string; isbn: string | null; cover_url: string | null; description: string | null; updated_at: string }> {
+  ): Promise<{ id: string; title: string; author: string; isbn: string | null; cover_url: string | null; description: string | null; category: string | null; updated_at: string }> {
     try {
       // Step 1: Check if book exists and user has permission to edit
       const { data: existingBook, error: checkError } = await this.supabase
@@ -684,6 +687,10 @@ export class BookService {
       if (updateData.description !== undefined) {
         bookUpdate.description = updateData.description ? updateData.description.trim() : null
       }
+      
+      if (updateData.category !== undefined) {
+        bookUpdate.category = updateData.category ? updateData.category.trim() : null
+      }
 
       // Step 4: Update the book
       const { data: updatedBook, error: updateError } = await this.supabase
@@ -691,8 +698,8 @@ export class BookService {
         .update(bookUpdate)
         .eq('id', bookId)
         .eq('created_by', userId) // Additional security check
-        .select('id, title, author, isbn, cover_url, description, updated_at')
-        .single()
+        .select('id, title, author, isbn, cover_url, description, category, updated_at')
+        .maybeSingle()
 
       if (updateError) {
         console.error('Error updating book:', updateError)
@@ -709,7 +716,9 @@ export class BookService {
       }
 
       if (!updatedBook) {
-        const error = new Error('Book not found or permission denied') as BookServiceError
+        // This means no rows were affected - book doesn't exist or user doesn't have permission
+        // Since we already checked existence and permissions above, this shouldn't happen
+        const error = new Error('Book update failed - no rows affected') as BookServiceError
         error.status = 404
         error.code = 'BOOK_NOT_FOUND'
         throw error
