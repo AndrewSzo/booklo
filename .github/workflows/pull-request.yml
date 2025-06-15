@@ -58,6 +58,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: lint
     environment: integration
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     env:
       BASE_URL: ${{ secrets.BASE_URL }}
       API_URL: ${{ secrets.API_URL }}
@@ -165,13 +169,56 @@ jobs:
         if: always()
         run: cd apps/booklo-e2e && npm run allure:generate
 
-      - name: Deploy Allure Report to GitHub Pages
+      - name: Create Allure Report README
         if: always()
+        run: |
+          cd apps/booklo-e2e/reports/allure-report
+          cat > README.md << 'EOF'
+          # 📊 Allure Test Report
+          
+          ## 🚀 How to view this report
+          
+          1. **Download this artifact** from GitHub Actions
+          2. **Extract the ZIP file** to your local machine
+          3. **Open `index.html`** in your web browser
+          
+          ## 📋 What's included
+          
+          - ✅ **Test Results Overview** - Summary of passed/failed tests
+          - 🎯 **Detailed Test Steps** - Step-by-step execution details
+          - 📸 **Screenshots** - Automatically captured screenshots
+          - 🐛 **Failure Analysis** - Error details and stack traces
+          - 📈 **Test Timeline** - Execution timeline and performance
+          - 🏷️ **Test Categories** - Organized by features and scenarios
+          
+          ## 🔍 Key Features
+          
+          - **Interactive Timeline** - See how tests executed over time
+          - **Filterable Results** - Filter by status, feature, or tags
+          - **Rich Attachments** - Screenshots, logs, and other files
+          - **Test History** - Track test stability over time
+          - **Environment Info** - Browser, OS, and runtime details
+          
+          Generated: $(date)
+          Commit: ${{ github.sha }}
+          Branch: ${{ github.ref_name }}
+          EOF
+
+      - name: Deploy Allure Report to GitHub Pages
+        if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./apps/booklo-e2e/reports/allure-report
           destination_dir: allure-reports/pr-${{ github.event.number }}-${{ github.run_number }}
+
+      - name: Upload Allure Report as Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: apps/booklo-e2e/reports/allure-report/
+          retention-days: 30
 
       - name: Upload E2E test artifacts
         uses: actions/upload-artifact@v4
@@ -215,8 +262,6 @@ jobs:
 
             const overallStatus = [lintStatus, unitTestsStatus, e2eTestsStatus].every(status => status === 'success') ? 'success' : 'failure';
 
-            const allureReportUrl = `https://${context.repo.owner}.github.io/${context.repo.repo}/allure-reports/pr-${context.issue.number}-${context.runNumber}`;
-
             const comment = `## 🔍 Pull Request Check Results
 
             ### Job Status Summary
@@ -227,12 +272,14 @@ jobs:
             ### Overall Status: ${statusEmoji[overallStatus] || '❓'} ${overallStatus === 'success' ? 'All checks passed!' : 'Some checks failed'}
 
             ### 📊 Test Reports
-            ${e2eTestsStatus !== 'skipped' ? `- **Allure Report**: [View detailed test results](${allureReportUrl}) 🎯` : '- **Allure Report**: Not available (E2E tests were skipped)'}
+            ${e2eTestsStatus !== 'skipped' ? `- **Allure Report**: [Download from artifacts](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}/artifacts) 🎯
+            - **E2E Test Results**: Check artifacts for detailed screenshots and videos` : '- **Test Reports**: Not available (E2E tests were skipped)'}
 
             ---
             📊 **Branch**: \`${pr.head.ref}\`
             🔗 **Commit**: \`${pr.head.sha.substring(0, 7)}\`
-            ⏰ **Time**: ${new Date().toLocaleString()}`;
+            ⏰ **Time**: ${new Date().toLocaleString()}
+            🔗 **Workflow Run**: [View details](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`;
 
             // Find existing comment
             const { data: comments } = await github.rest.issues.listComments({
