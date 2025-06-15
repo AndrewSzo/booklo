@@ -60,7 +60,7 @@ export default function LibraryView() {
   return (
     <div className="flex flex-col h-full" data-testid="library-view">
       <div className="flex-1 overflow-y-auto">
-        <div className="p-4 md:p-6 space-y-6">
+        <div className="px-4 py-4 md:px-6 md:py-6 lg:px-8 lg:py-8 space-y-6 md:space-y-8 pb-8 md:pb-12 lg:pb-16">
           <LibraryHeader
             currentStatus={state.filters.status}
             searchQuery={state.filters.searchQuery}
@@ -71,7 +71,7 @@ export default function LibraryView() {
           />
           
           {state.error ? (
-            <div className="flex items-center justify-center py-16" data-testid="library-error">
+            <div className="flex items-center justify-center py-16 md:py-20 lg:py-24" data-testid="library-error">
               <div className="text-center space-y-4">
                 <div className="text-destructive text-lg font-medium" data-testid="error-title">
                   Błąd podczas ładowania książek
@@ -87,7 +87,7 @@ export default function LibraryView() {
               </div>
             </div>
           ) : (
-            <>
+            <div className="space-y-8 md:space-y-10 lg:space-y-12">
               <BooksGrid
                 books={state.books}
                 isLoading={state.isLoading}
@@ -109,7 +109,7 @@ export default function LibraryView() {
                   data-testid="load-more-button"
                 />
               )}
-            </>
+            </div>
           )}
         </div>
       </div>

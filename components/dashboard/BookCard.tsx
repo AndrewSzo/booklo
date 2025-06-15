@@ -2,7 +2,7 @@
 
 import { BookListItemDTO } from '@/lib/types'
 import { Card, CardContent } from '@/components/ui/card'
-import { Star, Calendar, User } from 'lucide-react'
+import { Star, Calendar, User, Tag } from 'lucide-react'
 import { useBookDetailsContext } from '@/lib/providers/BookDetailsContext'
 
 interface BookCardProps {
@@ -86,6 +86,15 @@ export default function BookCard({ book, onClick, variant = 'compact', 'data-tes
                 <span className="truncate">{book.author}</span>
               </div>
 
+              {book.category && (
+                <div className="flex items-center gap-1 text-sm text-muted-foreground" data-testid="book-category">
+                  <Tag className="h-4 w-4 flex-shrink-0" />
+                  <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
+                    {book.category}
+                  </span>
+                </div>
+              )}
+
               {book.user_rating && renderStars(book.user_rating)}
 
               <div className="flex items-center gap-1 text-sm text-muted-foreground" data-testid="book-date">
@@ -128,6 +137,15 @@ export default function BookCard({ book, onClick, variant = 'compact', 'data-tes
               <h4 className="font-medium text-foreground line-clamp-2" data-testid="book-title">{book.title}</h4>
               <p className="text-sm text-muted-foreground" data-testid="book-author">{book.author}</p>
             </div>
+
+            {book.category && (
+              <div className="flex items-center gap-1 text-sm text-muted-foreground" data-testid="book-category">
+                <Tag className="h-4 w-4 flex-shrink-0" />
+                <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
+                  {book.category}
+                </span>
+              </div>
+            )}
 
             {book.user_rating && renderStars(book.user_rating)}
 

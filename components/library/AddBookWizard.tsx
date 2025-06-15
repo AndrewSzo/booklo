@@ -107,6 +107,7 @@ export default function AddBookWizard({ onComplete, onCancel, onDirtyChange }: A
         cover_url: formData.basicInfo.cover_url?.trim() || undefined,
         description: formData.basicInfo.description?.trim() || undefined,
         status: formData.categorization.status,
+        category: formData.categorization.category,
         rating: formData.review.rating,
         tags: formData.categorization.tags
       }

@@ -7,8 +7,24 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import type { BookInfoSectionProps } from './types'
 import type { ReadingStatus, UpdateBookDTO } from '@/lib/types'
+
+const bookCategories = [
+  { value: 'rozwoj-osobisty', label: 'Rozwój osobisty' },
+  { value: 'sci-fi', label: 'Science Fiction' },
+  { value: 'fantasy', label: 'Fantasy' },
+  { value: 'kryminal', label: 'Kryminał' },
+  { value: 'romans', label: 'Romans' },
+  { value: 'biografie', label: 'Biografie' },
+  { value: 'biznes', label: 'Biznes' },
+  { value: 'historia', label: 'Historia' },
+  { value: 'klasyka', label: 'Klasyka' },
+  { value: 'thriller', label: 'Thriller' },
+  { value: 'psychologia', label: 'Psychologia' },
+  { value: 'sport', label: 'Sport' },
+]
 
 const statusOptions: { value: ReadingStatus; label: string; color: string; bgColor: string; icon: React.ReactNode }[] = [
   { 
@@ -54,6 +70,7 @@ export function BookInfoSection({ book, onStatusChange, onRatingChange, onBookUp
     isbn: { field: 'isbn', value: book.isbn || '', editing: false },
     cover_url: { field: 'cover_url', value: book.cover_url || '', editing: false },
     description: { field: 'description', value: book.description || '', editing: false, multiline: true },
+    category: { field: 'category', value: book.category || '', editing: false },
   })
 
   const inputRefs = useRef<Record<string, HTMLInputElement | HTMLTextAreaElement | null>>({})
@@ -95,6 +112,18 @@ export function BookInfoSection({ book, onStatusChange, onRatingChange, onBookUp
       [fieldName]: { ...prev[fieldName], editing: true }
     }))
   }
+
+  // Synchronizacja stanu z propsami book
+  useEffect(() => {
+    setEditingFields(prev => ({
+      title: { ...prev.title, value: book.title },
+      author: { ...prev.author, value: book.author },
+      isbn: { ...prev.isbn, value: book.isbn || '' },
+      cover_url: { ...prev.cover_url, value: book.cover_url || '' },
+      description: { ...prev.description, value: book.description || '' },
+      category: { ...prev.category, value: book.category || '' },
+    }))
+  }, [book])
 
   // Focus na pole po rozpoczęciu edycji
   useEffect(() => {
@@ -209,6 +238,114 @@ export function BookInfoSection({ book, onStatusChange, onRatingChange, onBookUp
   const formatDate = (dateString: string | null) => {
     if (!dateString) return null
     return new Date(dateString).toLocaleDateString()
+  }
+
+  // Komponent do edycji kategorii
+  const CategoryField = () => {
+    const field = editingFields.category
+    const isEditing = field?.editing || false
+    const value = field?.value || ''
+
+    const handleCategoryChange = (newValue: string) => {
+      const categoryValue = newValue === 'none' ? '' : newValue
+      updateFieldValue('category', categoryValue)
+    }
+
+    const saveCategoryField = async () => {
+      setIsLoading(true)
+      try {
+        const categoryValue = value === 'none' || value === '' ? null : value
+        const updateData: UpdateBookDTO = {
+          category: categoryValue
+        }
+        
+        await updateBookAPI(book.id, updateData)
+        
+        setEditingFields(prev => ({
+          ...prev,
+          category: { ...prev.category, editing: false, value: categoryValue || '' }
+        }))
+
+        // Refresh book data
+        if (onBookUpdate) {
+          onBookUpdate({ ...book, category: categoryValue })
+        }
+      } catch (error) {
+        console.error('Failed to update category:', error)
+        // Revert to original value
+        setEditingFields(prev => ({
+          ...prev,
+          category: { ...prev.category, value: book.category || '', editing: false }
+        }))
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    if (isEditing) {
+      return (
+        <div className="space-y-2">
+          <Label>Kategoria</Label>
+          <div className="flex items-center space-x-2">
+            <Select value={value || 'none'} onValueChange={handleCategoryChange}>
+              <SelectTrigger className="flex-1">
+                <SelectValue placeholder="Wybierz kategorię" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Brak kategorii</SelectItem>
+                {bookCategories.map((category) => (
+                  <SelectItem key={category.value} value={category.value}>
+                    {category.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button
+              size="sm"
+              onClick={saveCategoryField}
+              disabled={isLoading}
+              className="h-8 w-8 p-0"
+            >
+              <Check className="h-4 w-4" />
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => cancelEdit('category')}
+              disabled={isLoading}
+              className="h-8 w-8 p-0"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )
+    }
+
+    return (
+      <div className="space-y-2">
+        <Label>Kategoria</Label>
+        <div className="flex items-center justify-between group">
+          <div className="flex-1">
+            {value && value !== 'none' ? (
+              <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
+                {bookCategories.find(cat => cat.value === value)?.label || value}
+              </span>
+            ) : (
+              <span className="text-gray-400 italic text-sm">Brak kategorii</span>
+            )}
+          </div>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => startEditing('category')}
+            className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+          >
+            <Edit2 className="h-3 w-3" />
+          </Button>
+        </div>
+      </div>
+    )
   }
 
   // Komponent do edycji pojedynczego pola
@@ -330,6 +467,9 @@ export function BookInfoSection({ book, onStatusChange, onRatingChange, onBookUp
 
           {/* Description */}
           <EditableField fieldName="description" label="Description" />
+
+          {/* Category */}
+          <CategoryField />
 
           {/* Reading Status */}
           <div className="space-y-3">

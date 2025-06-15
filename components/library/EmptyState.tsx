@@ -133,22 +133,22 @@ export default function EmptyState({
   const Icon = content.icon
 
   return (
-    <div className={`flex flex-col items-center justify-center py-16 px-6 ${className}`} data-testid={testId}>
-      <div className="w-24 h-24 mb-6 bg-muted rounded-full flex items-center justify-center" data-testid="empty-state-icon">
-        <Icon className="h-12 w-12 text-muted-foreground" />
+    <div className={`flex flex-col items-center justify-center py-12 md:py-16 lg:py-20 px-4 md:px-6 lg:px-8 ${className}`} data-testid={testId}>
+      <div className="w-20 h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 mb-4 md:mb-6 lg:mb-8 bg-muted rounded-full flex items-center justify-center" data-testid="empty-state-icon">
+        <Icon className="h-10 w-10 md:h-12 md:w-12 lg:h-14 lg:w-14 text-muted-foreground" />
       </div>
       
-      <div className="text-center space-y-4 max-w-md">
-        <h3 className="text-xl font-semibold text-foreground" data-testid="empty-state-title">{content.title}</h3>
-        <p className="text-muted-foreground" data-testid="empty-state-description">
+      <div className="text-center space-y-3 md:space-y-4 lg:space-y-6 max-w-sm md:max-w-md lg:max-w-lg">
+        <h3 className="text-lg md:text-xl lg:text-2xl font-semibold text-foreground" data-testid="empty-state-title">{content.title}</h3>
+        <p className="text-sm md:text-base text-muted-foreground leading-relaxed" data-testid="empty-state-description">
           {content.description}
         </p>
         
-        <div className="flex flex-col sm:flex-row gap-3 justify-center" data-testid="empty-state-actions">
+        <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center pt-2 md:pt-4" data-testid="empty-state-actions">
           <Button 
             onClick={content.primaryAction.action} 
             variant={content.primaryAction.variant}
-            className="gap-2"
+            className="gap-2 px-4 py-2 md:px-6 md:py-3"
             data-testid="empty-state-primary-action"
           >
             {content.primaryAction.label.includes('Dodaj') && <Plus className="h-4 w-4" />}
@@ -159,6 +159,7 @@ export default function EmptyState({
           <Button 
             onClick={content.secondaryAction.action}
             variant={content.secondaryAction.variant}
+            className="px-4 py-2 md:px-6 md:py-3"
             data-testid="empty-state-secondary-action"
           >
             {content.secondaryAction.label}

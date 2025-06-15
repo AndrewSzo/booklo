@@ -17,7 +17,9 @@ export default async function LibraryPage() {
   return (
     <main className="min-h-screen bg-background" data-testid="library-page">
       <AppLayout>
-        <LibraryView />
+        <div className="h-full overflow-hidden">
+          <LibraryView />
+        </div>
       </AppLayout>
     </main>
   )

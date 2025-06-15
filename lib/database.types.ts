@@ -125,6 +125,7 @@ export type Database = {
       books: {
         Row: {
           author: string
+          category: string | null
           cover_url: string | null
           created_at: string
           created_by: string
@@ -136,6 +137,7 @@ export type Database = {
         }
         Insert: {
           author: string
+          category?: string | null
           cover_url?: string | null
           created_at?: string
           created_by: string
@@ -147,6 +149,7 @@ export type Database = {
         }
         Update: {
           author?: string
+          category?: string | null
           cover_url?: string | null
           created_at?: string
           created_by?: string
@@ -322,12 +325,20 @@ export type Database = {
       }
     }
     Functions: {
+      create_test_user_if_not_exists: {
+        Args: { email_param: string; password_param: string }
+        Returns: string
+      }
       refresh_book_popularity_stats: {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
       refresh_user_reading_stats: {
         Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      setup_test_user_data: {
+        Args: { user_id: string }
         Returns: undefined
       }
     }

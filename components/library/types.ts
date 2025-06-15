@@ -18,6 +18,7 @@ export interface BasicBookInfo {
 
 export interface BookCategorization {
   status: 'want_to_read' | 'reading' | 'finished'
+  category?: string
   tags: string[]
 }
 
