@@ -1,6 +1,10 @@
 // jest-dom adds custom jest matchers for asserting on DOM nodes.
 import '@testing-library/jest-dom'
 
+// Allure Jest setup
+const { registerAllureReporter } = require('allure-jest/dist/setup')
+registerAllureReporter()
+
 // Mock Next.js modules
 jest.mock('next/navigation', () => ({
   useRouter() {
@@ -22,7 +26,7 @@ jest.mock('next/navigation', () => ({
 }))
 
 // Mock Supabase
-jest.mock('@/lib/supabase/client', () => ({
+jest.mock('./lib/supabase/client', () => ({
   supabase: {
     auth: {
       getUser: jest.fn(),

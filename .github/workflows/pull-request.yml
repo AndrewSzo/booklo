@@ -158,8 +158,20 @@ jobs:
       - name: Install Playwright browsers
         run: cd apps/booklo-e2e && npx playwright install chromium firefox webkit
 
-      - name: Run E2E tests
-        run: npm run test:e2e:headless
+      - name: Run E2E tests with Allure
+        run: cd apps/booklo-e2e && npm run test:headless:allure
+
+      - name: Generate Allure Report
+        if: always()
+        run: cd apps/booklo-e2e && npm run allure:generate
+
+      - name: Deploy Allure Report to GitHub Pages
+        if: always()
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./apps/booklo-e2e/reports/allure-report
+          destination_dir: allure-reports/pr-${{ github.event.number }}-${{ github.run_number }}
 
       - name: Upload E2E test artifacts
         uses: actions/upload-artifact@v4
@@ -203,6 +215,8 @@ jobs:
 
             const overallStatus = [lintStatus, unitTestsStatus, e2eTestsStatus].every(status => status === 'success') ? 'success' : 'failure';
 
+            const allureReportUrl = `https://${context.repo.owner}.github.io/${context.repo.repo}/allure-reports/pr-${context.issue.number}-${context.runNumber}`;
+
             const comment = `## 🔍 Pull Request Check Results
 
             ### Job Status Summary
@@ -211,6 +225,9 @@ jobs:
             - **E2E Tests**: ${statusEmoji[e2eTestsStatus] || '❓'} ${e2eTestsStatus}
 
             ### Overall Status: ${statusEmoji[overallStatus] || '❓'} ${overallStatus === 'success' ? 'All checks passed!' : 'Some checks failed'}
+
+            ### 📊 Test Reports
+            ${e2eTestsStatus !== 'skipped' ? `- **Allure Report**: [View detailed test results](${allureReportUrl}) 🎯` : '- **Allure Report**: Not available (E2E tests were skipped)'}
 
             ---
             📊 **Branch**: \`${pr.head.ref}\`

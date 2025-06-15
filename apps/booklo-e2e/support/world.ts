@@ -177,7 +177,7 @@ BeforeAll(async function() {
   console.log('🚀 Starting E2E test suite...');
   
   // Create directories if they don't exist
-  const paths = ['./reports', './screenshots', './videos'];
+  const paths = ['./reports', './reports/allure-results', './screenshots', './videos'];
   
   paths.forEach(path => {
     if (!fs.existsSync(path)) {

@@ -72,7 +72,12 @@ export default function FilterTabs({
   }
 
   return (
-    <div className="flex flex-wrap gap-3" data-testid={testId}>
+    <div 
+      className="flex flex-wrap gap-3" 
+      data-testid={testId} 
+      role="tablist"
+      aria-label="Filtruj książki według statusu"
+    >
       {tabs.map((tab) => {
         const Icon = tab.icon
         const isActive = activeStatus === tab.status
@@ -88,6 +93,10 @@ export default function FilterTabs({
               ${isActive ? 'transform scale-105' : 'hover:scale-105'}
             `}
             data-testid={`filter-tab-${tab.status}`}
+            role="tab"
+            aria-selected={isActive}
+            aria-label={`${tab.label}${tab.count !== undefined ? ` ${tab.count}` : ''}`}
+            tabIndex={isActive ? 0 : -1}
           >
             <Icon className="h-5 w-5" />
             <span className="font-medium">{tab.label}</span>

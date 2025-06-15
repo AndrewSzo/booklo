@@ -57,7 +57,7 @@ describe('Utility Functions', () => {
     it('formats date correctly', () => {
       const date = new Date('2024-01-15T10:30:00Z')
       const formatted = formatDate(date)
-      expect(formatted).toMatch(/\d{2}\/\d{2}\/\d{4}/)
+      expect(formatted).toMatch(/\d{1,2}\.\d{1,2}\.\d{4}/) // Polish format: DD.MM.YYYY
     })
 
     it('handles invalid date', () => {

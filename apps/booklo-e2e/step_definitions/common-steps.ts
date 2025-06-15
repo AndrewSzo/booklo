@@ -1,6 +1,7 @@
 import { Given, When, Then } from '@cucumber/cucumber';
 import { expect } from '@playwright/test';
 import { ICustomWorld } from '../support/world';
+import { AllureHelper } from '../support/allure-helper';
 
 // Common Given steps
 Given('the application is running', async function(this: ICustomWorld) {
@@ -10,8 +11,10 @@ Given('the application is running', async function(this: ICustomWorld) {
 });
 
 Given('I am on the home page', async function(this: ICustomWorld) {
+  await AllureHelper.addStep('Navigate to home page');
   await this.pageFactory!.homePage.goto();
   await this.pageFactory!.homePage.assertPageLoaded();
+  await AllureHelper.addScreenshot(this, 'Home page loaded');
 });
 
 Given('I navigate to the login page', async function(this: ICustomWorld) {
