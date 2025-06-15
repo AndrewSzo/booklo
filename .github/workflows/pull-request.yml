@@ -119,7 +119,15 @@ jobs:
           NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
 
       - name: Start Next.js application
-        run: npm start &
+        run: |
+          echo "Starting Next.js application..."
+          npm start > app.log 2>&1 &
+          APP_PID=$!
+          echo "Application started with PID: $APP_PID"
+          echo $APP_PID > app.pid
+          sleep 5
+          echo "Application log after 5 seconds:"
+          cat app.log
         env:
           PORT: 3000
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -138,17 +146,37 @@ jobs:
 
       - name: Wait for application to be ready
         run: |
+          echo "Checking if application process is running..."
+          if [ -f app.pid ]; then
+            APP_PID=$(cat app.pid)
+            if ps -p $APP_PID > /dev/null; then
+              echo "Application process is running (PID: $APP_PID)"
+            else
+              echo "Application process died. Checking logs..."
+              cat app.log
+              exit 1
+            fi
+          fi
+          
+          echo "Waiting for application to respond on port 3000..."
           timeout 120 bash -c '
-            until curl -f ${{ secrets.BASE_URL }}; do
+            until curl -f http://localhost:3000; do
               echo "Waiting for application to start..."
               sleep 5
               # Check if the process is still running
-              if ! ps aux | grep "npm start" | grep -v grep > /dev/null; then
-                echo "Application process died. Checking logs..."
-                exit 1
+              if [ -f app.pid ]; then
+                APP_PID=$(cat app.pid)
+                if ! ps -p $APP_PID > /dev/null; then
+                  echo "Application process died. Checking logs..."
+                  cat app.log
+                  exit 1
+                fi
               fi
             done
           '
+          
+          echo "Application is ready! Final log check:"
+          cat app.log
 
       - name: Install E2E dependencies
         run: cd apps/booklo-e2e && npm ci
