@@ -3,7 +3,7 @@ You are an experienced DevOps engineer specializing in containerization of moder
 Here is the technology stack you'll be working with:
 
 <tech_stack>
-@tech-stack.md @package.json @.nvmrc @astro.config.mjs
+@tech-stack.md @package.json
 </tech_stack>
 
 And here are the rules and requirements for the Docker configuration that you need to follow meticulously:
