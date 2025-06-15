@@ -66,35 +66,9 @@ jobs:
           POSTGRES_DB: postgres
           POSTGRES_USER: postgres
         ports:
-          - 54324:5432
+          - 54322:5432
         options: >-
           --health-cmd "pg_isready -U postgres"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-      supabase:
-        image: supabase/studio:latest
-        ports:
-          - 54321:54321
-          - 54323:54323
-        env:
-          POSTGRES_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-          JWT_SECRET: ${{ secrets.SUPABASE_JWT_SECRET }}
-          ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-          SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          POSTGRES_HOST: db
-          POSTGRES_PORT: 5432
-          POSTGRES_DB: postgres
-          POSTGRES_USER: postgres
-          API_EXTERNAL_URL: http://localhost:54321
-          STUDIO_DEFAULT_ORGANIZATION: Default
-          STUDIO_DEFAULT_PROJECT: Default
-          SUPABASE_URL: http://localhost:54321
-          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        options: >-
-          --health-cmd "curl -f http://localhost:54321/rest/v1/ || exit 1"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -113,12 +87,17 @@ jobs:
       INACTIVE_USER_PASSWORD: ${{ secrets.INACTIVE_USER_PASSWORD }}
       LIBRARY_USER_EMAIL: ${{ secrets.LIBRARY_USER_EMAIL }}
       LIBRARY_USER_PASSWORD: ${{ secrets.LIBRARY_USER_PASSWORD }}
-      NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+      NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       REPORT_PATH: ./reports
       SCREENSHOT_PATH: ./screenshots
+      # Database connection for local testing
+      DATABASE_URL: postgresql://postgres:${{ secrets.SUPABASE_DB_PASSWORD }}@localhost:54322/postgres
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -137,7 +116,7 @@ jobs:
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-          NEXT_PUBLIC_SITE_URL: http://localhost:3000
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
 
       - name: Start Next.js application
         run: npm start &
@@ -145,36 +124,27 @@ jobs:
           PORT: 3000
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-          NEXT_PUBLIC_SITE_URL: http://localhost:3000
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
 
-      - name: Wait for Supabase to be ready
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Wait for database to be ready
         run: |
           echo "Waiting for PostgreSQL to be ready..."
-          timeout 60 bash -c 'until docker exec ${{ job.services.db.id }} pg_isready -U postgres; do sleep 2; done'
-          
-          echo "Waiting for Supabase API to be ready..."
-          timeout 60 bash -c 'until curl -f http://localhost:54321/rest/v1/; do sleep 2; done'
-          
-          echo "Waiting for Supabase Studio to be ready..."
-          timeout 60 bash -c 'until curl -f http://localhost:54323; do sleep 2; done'
-
-      - name: Run database migrations
-        run: |
-          # Wait for database to be ready
-          sleep 10
-          # Run migrations
-          supabase db reset
+          timeout 60 bash -c 'until pg_isready -h localhost -p 54322 -U postgres; do sleep 2; done'
 
       - name: Wait for application to be ready
         run: |
           timeout 120 bash -c '
-            until curl -f http://localhost:3000; do
+            until curl -f ${{ secrets.BASE_URL }}; do
               echo "Waiting for application to start..."
               sleep 5
               # Check if the process is still running
               if ! ps aux | grep "npm start" | grep -v grep > /dev/null; then
                 echo "Application process died. Checking logs..."
-                cat .next/server/app/api/route.js
                 exit 1
               fi
             done
