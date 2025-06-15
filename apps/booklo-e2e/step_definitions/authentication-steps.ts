@@ -220,75 +220,43 @@ Given('I am logged in as a regular user', async function(this: ICustomWorld) {
   expect(finalUrl).not.toContain('/auth/login');
 });
 
-Given('I am logged in as a {string}', async function(this: ICustomWorld, userType: string) {
+Given('I am logged in as a {string}', { timeout: 60000 }, async function(this: ICustomWorld, userType: string) {
   const user = TestUsers.getUser(userType);
   
-  // First try to login - if it fails, register the user
+  // Simply try to login - user should already exist (created by setup script)
   await this.pageFactory!.loginPage.goto();
-  await this.pageFactory!.loginPage.fillEmail(user.email);
-  await this.pageFactory!.loginPage.fillPassword(user.password);
-  await this.pageFactory!.loginPage.clickLogin();
+  await this.pageFactory!.loginPage.login(user.email, user.password);
   
-  // Wait for login attempt to complete
-  await this.page!.waitForTimeout(1500);
-  const currentUrl = this.page!.url();
-  console.log(`URL after login attempt: ${currentUrl}`);
+  // Wait for login to complete and redirect away from login page
+  await this.page!.waitForLoadState('networkidle');
   
-  // If still on login page, user probably doesn't exist - register them
-  if (currentUrl.includes('/auth/login')) {
-    console.log(`User ${userType} doesn't exist, registering...`);
+  // Wait for URL to change from login page (with timeout)
+  try {
+    await this.page!.waitForFunction(
+      () => !window.location.href.includes('/auth/login'),
+      { timeout: 10000 }
+    );
+  } catch (error) {
+    console.log('Login may have failed - still on login page after 10 seconds');
+    const currentUrl = this.page!.url();
+    console.log(`Current URL: ${currentUrl}`);
     
-    try {
-      // Go to registration page
-      const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
-      await this.page!.goto(`${baseUrl}/auth/register`);
-      await this.page!.waitForLoadState('networkidle');
-      
-      // Fill registration form
-      await this.page!.locator('input[name="email"]').fill(user.email);
-      await this.page!.locator('input[name="password"]').fill(user.password);
-      
-      // Check if there's a confirm password field
-      const confirmPasswordField = this.page!.locator('input[name="confirmPassword"]');
-      if (await confirmPasswordField.isVisible()) {
-        await confirmPasswordField.fill(user.password);
+    // Check if there's an error message on the page
+    const errorElements = await this.page!.locator('[data-testid="auth-error"], .error, [role="alert"]').all();
+    for (const errorElement of errorElements) {
+      const isVisible = await errorElement.isVisible();
+      if (isVisible) {
+        const errorText = await errorElement.textContent();
+        console.log(`Error message found: ${errorText}`);
       }
-      
-      // Check if there are name fields
-      if (user.firstName) {
-        const firstNameField = this.page!.locator('[data-testid="first-name-input"]');
-        if (await firstNameField.isVisible()) {
-          await firstNameField.fill(user.firstName);
-        }
-      }
-      
-      if (user.lastName) {
-        const lastNameField = this.page!.locator('[data-testid="last-name-input"]');
-        if (await lastNameField.isVisible()) {
-          await lastNameField.fill(user.lastName);
-        }
-      }
-      
-      // Submit registration form
-      await this.page!.locator('button[type="submit"]').click();
-      await this.page!.waitForLoadState('networkidle');
-      
-      // Wait a bit more for registration to complete
-      await this.page!.waitForTimeout(3000);
-      
-      // Now try to login again
-      await this.pageFactory!.loginPage.goto();
-      await this.pageFactory!.loginPage.login(user.email, user.password);
-    } catch (error) {
-      console.error('Error registering user:', error);
-      throw error;
     }
+    
+    throw new Error(`Login failed - still on login page: ${currentUrl}`);
   }
   
   // Verify login was successful
-  await this.page!.waitForLoadState('networkidle');
   const finalUrl = this.page!.url();
-  console.log(`Final URL after login attempt: ${finalUrl}`);
+  console.log(`Final URL after login: ${finalUrl}`);
   expect(finalUrl).not.toContain('/auth/login');
 });
 
