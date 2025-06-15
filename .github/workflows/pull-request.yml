@@ -58,6 +58,18 @@ jobs:
     runs-on: ubuntu-latest
     needs: lint
     environment: integration
+    services:
+      supabase:
+        image: supabase/supabase-local:latest
+        ports:
+          - 54321:54321
+          - 54322:54322
+          - 54323:54323
+        env:
+          POSTGRES_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          JWT_SECRET: ${{ secrets.SUPABASE_JWT_SECRET }}
+          ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
     env:
       BASE_URL: ${{ secrets.BASE_URL }}
       API_URL: ${{ secrets.API_URL }}
@@ -110,9 +122,28 @@ jobs:
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
           NEXT_PUBLIC_SITE_URL: http://localhost:3000
 
+      - name: Wait for Supabase to be ready
+        run: |
+          timeout 60 bash -c 'until curl -f ${{ secrets.SUPABASE_URL }}/rest/v1/; do sleep 2; done'
+
+      - name: Run database migrations
+        run: |
+          supabase db reset
+
       - name: Wait for application to be ready
         run: |
-          timeout 60 bash -c 'until curl -f http://localhost:3000; do sleep 2; done'
+          timeout 120 bash -c '
+            until curl -f http://localhost:3000; do
+              echo "Waiting for application to start..."
+              sleep 5
+              # Check if the process is still running
+              if ! ps aux | grep "npm start" | grep -v grep > /dev/null; then
+                echo "Application process died. Checking logs..."
+                cat .next/server/app/api/route.js
+                exit 1
+              fi
+            done
+          '
 
       - name: Install E2E dependencies
         run: cd apps/booklo-e2e && npm ci
