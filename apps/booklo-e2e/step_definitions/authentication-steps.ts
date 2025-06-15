@@ -220,66 +220,17 @@ Given('I am logged in as a regular user', async function(this: ICustomWorld) {
   expect(finalUrl).not.toContain('/auth/login');
 });
 
-Given('I am logged in as a {string}', { timeout: 180000 }, async function(this: ICustomWorld, userType: string) {
+Given('I am logged in as a {string}', { timeout: 60000 }, async function(this: ICustomWorld, userType: string) {
   const user = TestUsers.getUser(userType);
   
-  // First try to login - if it fails, register the user
+  // Simply try to login - user should already exist (created by setup script)
   await this.pageFactory!.loginPage.goto();
-  await this.pageFactory!.loginPage.fillEmail(user.email);
-  await this.pageFactory!.loginPage.fillPassword(user.password);
-  await this.pageFactory!.loginPage.clickLogin();
-  
-  // Wait for login attempt to complete
-  await this.page!.waitForTimeout(1500);
-  const currentUrl = this.page!.url();
-  console.log(`URL after login attempt: ${currentUrl}`);
-  
-  // If still on login page, user probably doesn't exist - register them
-  if (currentUrl.includes('/auth/login')) {
-    console.log(`User ${userType} doesn't exist, registering...`);
-    
-    try {
-      // Go to registration page
-      const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
-      await this.page!.goto(`${baseUrl}/auth/register`);
-      await this.page!.waitForLoadState('networkidle');
-      
-      // Fill registration form - only the fields that actually exist
-      await this.page!.locator('input[name="email"]').fill(user.email);
-      await this.page!.locator('input[name="password"]').fill(user.password);
-      await this.page!.locator('input[name="confirmPassword"]').fill(user.password);
-      
-      // Submit registration form
-      await this.page!.locator('button[type="submit"]').click();
-      
-      // Wait for registration to complete - look for success message or redirect
-      try {
-        // Wait for either success message or redirect
-        await Promise.race([
-          this.page!.waitForSelector('text=Konto zostało utworzone', { timeout: 10000 }),
-          this.page!.waitForURL(url => !url.toString().includes('/auth/register'), { timeout: 10000 })
-        ]);
-      } catch (error) {
-        console.log('Registration may have failed or taken longer than expected');
-        // Continue anyway, we'll try to login
-      }
-      
-      // Wait a bit more for registration to complete
-      await this.page!.waitForTimeout(3000);
-      
-      // Now try to login again
-      await this.pageFactory!.loginPage.goto();
-      await this.pageFactory!.loginPage.login(user.email, user.password);
-    } catch (error) {
-      console.error('Error registering user:', error);
-      throw error;
-    }
-  }
+  await this.pageFactory!.loginPage.login(user.email, user.password);
   
   // Verify login was successful
   await this.page!.waitForLoadState('networkidle');
   const finalUrl = this.page!.url();
-  console.log(`Final URL after login attempt: ${finalUrl}`);
+  console.log(`Final URL after login: ${finalUrl}`);
   expect(finalUrl).not.toContain('/auth/login');
 });
 

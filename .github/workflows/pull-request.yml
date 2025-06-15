@@ -178,6 +178,12 @@ jobs:
           echo "Application is ready! Final log check:"
           cat app.log
 
+      - name: Create test user
+        run: node scripts/create-test-user.js
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
       - name: Install E2E dependencies
         run: cd apps/booklo-e2e && npm ci
 
