@@ -59,6 +59,20 @@ jobs:
     needs: lint
     environment: integration
     services:
+      db:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          POSTGRES_DB: postgres
+          POSTGRES_USER: postgres
+        ports:
+          - 54324:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
       supabase:
         image: supabase/studio:latest
         ports:
@@ -76,22 +90,11 @@ jobs:
           API_EXTERNAL_URL: http://localhost:54321
           STUDIO_DEFAULT_ORGANIZATION: Default
           STUDIO_DEFAULT_PROJECT: Default
+          SUPABASE_URL: http://localhost:54321
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         options: >-
-          --health-cmd "pg_isready -U postgres"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-      db:
-        image: postgres:15
-        env:
-          POSTGRES_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-          POSTGRES_DB: postgres
-          POSTGRES_USER: postgres
-        ports:
-          - 54324:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres"
+          --health-cmd "curl -f http://localhost:54321/rest/v1/ || exit 1"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -110,9 +113,6 @@ jobs:
       INACTIVE_USER_PASSWORD: ${{ secrets.INACTIVE_USER_PASSWORD }}
       LIBRARY_USER_EMAIL: ${{ secrets.LIBRARY_USER_EMAIL }}
       LIBRARY_USER_PASSWORD: ${{ secrets.LIBRARY_USER_PASSWORD }}
-      SUPABASE_URL: http://localhost:54321
-      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
       NEXT_PUBLIC_SITE_URL: http://localhost:3000
@@ -154,6 +154,9 @@ jobs:
           
           echo "Waiting for Supabase API to be ready..."
           timeout 60 bash -c 'until curl -f http://localhost:54321/rest/v1/; do sleep 2; done'
+          
+          echo "Waiting for Supabase Studio to be ready..."
+          timeout 60 bash -c 'until curl -f http://localhost:54323; do sleep 2; done'
 
       - name: Run database migrations
         run: |
