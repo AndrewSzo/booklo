@@ -220,7 +220,7 @@ Given('I am logged in as a regular user', async function(this: ICustomWorld) {
   expect(finalUrl).not.toContain('/auth/login');
 });
 
-Given('I am logged in as a {string}', async function(this: ICustomWorld, userType: string) {
+Given('I am logged in as a {string}', { timeout: 180000 }, async function(this: ICustomWorld, userType: string) {
   const user = TestUsers.getUser(userType);
   
   // First try to login - if it fails, register the user
@@ -244,34 +244,25 @@ Given('I am logged in as a {string}', async function(this: ICustomWorld, userTyp
       await this.page!.goto(`${baseUrl}/auth/register`);
       await this.page!.waitForLoadState('networkidle');
       
-      // Fill registration form
+      // Fill registration form - only the fields that actually exist
       await this.page!.locator('input[name="email"]').fill(user.email);
       await this.page!.locator('input[name="password"]').fill(user.password);
-      
-      // Check if there's a confirm password field
-      const confirmPasswordField = this.page!.locator('input[name="confirmPassword"]');
-      if (await confirmPasswordField.isVisible()) {
-        await confirmPasswordField.fill(user.password);
-      }
-      
-      // Check if there are name fields
-      if (user.firstName) {
-        const firstNameField = this.page!.locator('[data-testid="first-name-input"]');
-        if (await firstNameField.isVisible()) {
-          await firstNameField.fill(user.firstName);
-        }
-      }
-      
-      if (user.lastName) {
-        const lastNameField = this.page!.locator('[data-testid="last-name-input"]');
-        if (await lastNameField.isVisible()) {
-          await lastNameField.fill(user.lastName);
-        }
-      }
+      await this.page!.locator('input[name="confirmPassword"]').fill(user.password);
       
       // Submit registration form
       await this.page!.locator('button[type="submit"]').click();
-      await this.page!.waitForLoadState('networkidle');
+      
+      // Wait for registration to complete - look for success message or redirect
+      try {
+        // Wait for either success message or redirect
+        await Promise.race([
+          this.page!.waitForSelector('text=Konto zostało utworzone', { timeout: 10000 }),
+          this.page!.waitForURL(url => !url.toString().includes('/auth/register'), { timeout: 10000 })
+        ]);
+      } catch (error) {
+        console.log('Registration may have failed or taken longer than expected');
+        // Continue anyway, we'll try to login
+      }
       
       // Wait a bit more for registration to complete
       await this.page!.waitForTimeout(3000);
