@@ -227,8 +227,34 @@ Given('I am logged in as a {string}', { timeout: 60000 }, async function(this: I
   await this.pageFactory!.loginPage.goto();
   await this.pageFactory!.loginPage.login(user.email, user.password);
   
-  // Verify login was successful
+  // Wait for login to complete and redirect away from login page
   await this.page!.waitForLoadState('networkidle');
+  
+  // Wait for URL to change from login page (with timeout)
+  try {
+    await this.page!.waitForFunction(
+      () => !window.location.href.includes('/auth/login'),
+      { timeout: 10000 }
+    );
+  } catch (error) {
+    console.log('Login may have failed - still on login page after 10 seconds');
+    const currentUrl = this.page!.url();
+    console.log(`Current URL: ${currentUrl}`);
+    
+    // Check if there's an error message on the page
+    const errorElements = await this.page!.locator('[data-testid="auth-error"], .error, [role="alert"]').all();
+    for (const errorElement of errorElements) {
+      const isVisible = await errorElement.isVisible();
+      if (isVisible) {
+        const errorText = await errorElement.textContent();
+        console.log(`Error message found: ${errorText}`);
+      }
+    }
+    
+    throw new Error(`Login failed - still on login page: ${currentUrl}`);
+  }
+  
+  // Verify login was successful
   const finalUrl = this.page!.url();
   console.log(`Final URL after login: ${finalUrl}`);
   expect(finalUrl).not.toContain('/auth/login');
