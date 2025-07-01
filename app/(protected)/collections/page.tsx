@@ -3,6 +3,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Plus, BookOpen } from 'lucide-react'
 
+export const runtime = 'edge'
+
 export default function CollectionsPage() {
   return (
     <div className="container mx-auto px-4 py-8">

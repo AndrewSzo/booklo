@@ -1,6 +1,8 @@
 import { NextRequest } from 'next/server';
 import OpenAI from 'openai';
 
+export const runtime = 'edge';
+
 // Initialize OpenAI client only when needed to avoid build-time errors
 function getOpenAIClient() {
   return new OpenAI({

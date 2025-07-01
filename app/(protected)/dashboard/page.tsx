@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server'
 import DashboardLayout from '@/components/dashboard/DashboardLayout'
 import DashboardContent from '@/components/dashboard/DashboardContent'
 
+export const runtime = 'edge'
+
 export default async function DashboardPage() {
   const supabase = await createClient()
   
