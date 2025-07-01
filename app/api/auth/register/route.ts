@@ -63,7 +63,10 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error('Supabase register error:', error.message)
       return NextResponse.json(
-        { error: getAuthErrorMessage(error.message) },
+        { 
+          error: getAuthErrorMessage(error.message),
+          debug: error.message // Temporary debug info
+        },
         { status: 400 }
       )
     }
