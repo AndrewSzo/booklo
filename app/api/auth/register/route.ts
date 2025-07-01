@@ -6,8 +6,34 @@ export const runtime = 'edge'
 
 export async function POST(request: NextRequest) {
   try {
+    // Debug: Check environment variables
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
+    
+    console.log('Environment check:', {
+      hasUrl: !!supabaseUrl,
+      hasKey: !!supabaseAnonKey,
+      hasSiteUrl: !!siteUrl,
+      siteUrl: siteUrl
+    })
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      console.error('Missing Supabase environment variables')
+      return NextResponse.json(
+        { error: 'Konfiguracja serwera jest nieprawidłowa' },
+        { status: 500 }
+      )
+    }
+
     const body = await request.json()
     const { email, password, confirmPassword } = body
+    
+    console.log('Register attempt:', { 
+      email: email?.substring(0, 3) + '***',
+      hasPassword: !!password,
+      hasConfirmPassword: !!confirmPassword
+    })
     
     // Validate input
     const validationResult = registerSchema.safeParse({ 
@@ -17,6 +43,7 @@ export async function POST(request: NextRequest) {
     })
     
     if (!validationResult.success) {
+      console.log('Validation failed:', validationResult.error.errors)
       return NextResponse.json(
         { error: 'Dane rejestracji są nieprawidłowe' },
         { status: 400 }
@@ -29,17 +56,19 @@ export async function POST(request: NextRequest) {
       email,
       password,
       options: {
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
+        emailRedirectTo: `${siteUrl || 'https://booklo.pages.dev'}/auth/callback`
       }
     })
 
     if (error) {
+      console.error('Supabase register error:', error.message)
       return NextResponse.json(
         { error: getAuthErrorMessage(error.message) },
         { status: 400 }
       )
     }
 
+    console.log('Registration successful')
     return NextResponse.json({ 
       success: 'Sprawdź swoją skrzynkę e-mail w celu potwierdzenia konta' 
     })
