@@ -2,8 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { loginSchema } from '@/lib/validations/auth'
 
-// Remove edge runtime to test if that's the issue
-// export const runtime = 'edge'
+export const runtime = 'edge'
 
 export async function POST(request: NextRequest) {
   try {
