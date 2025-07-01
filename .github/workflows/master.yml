@@ -30,16 +30,8 @@ jobs:
       - name: Setup Node.js and Dependencies
         uses: ./.github/actions/setup-node-deps
 
-      - name: Run unit tests with coverage
-        run: npm run test:coverage
-
-      - name: Upload unit test coverage
-        uses: codecov/codecov-action@v5
-        with:
-          file: ./coverage/lcov.info
-          flags: unit
-          name: unit-tests
-          fail_ci_if_error: false
+      - name: Run unit tests
+        run: npm run test:ci
 
   build-and-deploy:
     name: Build and Deploy to Cloudflare Pages
