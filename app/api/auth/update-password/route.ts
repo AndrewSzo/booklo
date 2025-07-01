@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/api'
 import { NextRequest, NextResponse } from 'next/server'
 import { newPasswordSchema } from '@/lib/validations/auth'
 
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = await createClient()
+    const supabase = createClient()
     
     const { error } = await supabase.auth.updateUser({
       password

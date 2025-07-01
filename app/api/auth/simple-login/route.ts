@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/api'
 import { NextRequest, NextResponse } from 'next/server'
 import { loginSchema } from '@/lib/validations/auth'
 
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     
     console.log('Validation passed, creating Supabase client')
 
-    const supabase = await createClient()
+    const supabase = createClient()
     
     console.log('Supabase client created, attempting sign in')
     

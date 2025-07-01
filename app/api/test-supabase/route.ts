@@ -1,11 +1,11 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/api'
 import { NextResponse } from 'next/server'
 
 export const runtime = 'edge'
 
 export async function GET() {
   try {
-    const supabase = await createClient()
+    const supabase = createClient()
     
     // Test basic connection
     const { data, error } = await supabase.auth.getSession()
