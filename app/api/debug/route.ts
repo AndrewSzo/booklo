@@ -12,13 +12,15 @@ export async function GET() {
     const debugInfo = {
       environment: nodeEnv,
       timestamp: new Date().toISOString(),
+      allEnvKeys: Object.keys(process.env).sort(),
+      supabaseEnvKeys: Object.keys(process.env).filter(key => key.includes('SUPABASE')),
       supabase: {
         hasUrl: !!supabaseUrl,
         hasKey: !!supabaseAnonKey,
         urlLength: supabaseUrl?.length || 0,
         keyLength: supabaseAnonKey?.length || 0,
-        urlPrefix: supabaseUrl?.substring(0, 8) || 'missing',
-        keyPrefix: supabaseAnonKey?.substring(0, 8) || 'missing'
+        urlPrefix: supabaseUrl?.substring(0, 20) || 'missing',
+        keyPrefix: supabaseAnonKey?.substring(0, 20) || 'missing'
       },
       site: {
         hasSiteUrl: !!siteUrl,

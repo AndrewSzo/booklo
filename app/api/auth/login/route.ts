@@ -14,7 +14,8 @@ export async function POST(request: NextRequest) {
       hasUrl: !!supabaseUrl,
       hasKey: !!supabaseAnonKey,
       urlLength: supabaseUrl?.length || 0,
-      keyLength: supabaseAnonKey?.length || 0
+      keyLength: supabaseAnonKey?.length || 0,
+      processEnvKeys: Object.keys(process.env).filter(key => key.includes('SUPABASE'))
     })
 
     if (!supabaseUrl || !supabaseAnonKey) {
