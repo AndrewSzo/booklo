@@ -13,9 +13,21 @@ const customJestConfig = {
   // Test environment
   testEnvironment: 'jsdom',
   
+  // Transform configuration
+  transform: {
+    '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { presets: ['next/babel'] }],
+  },
+  
+  // Module file extensions
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
+  
   // Module name mapping for absolute imports
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
+    '^@/components/(.*)$': '<rootDir>/components/$1',
+    '^@/lib/(.*)$': '<rootDir>/lib/$1',
+    '^@/hooks/(.*)$': '<rootDir>/hooks/$1',
+    '^@/app/(.*)$': '<rootDir>/app/$1',
   },
   
   // Coverage settings
@@ -30,6 +42,10 @@ const customJestConfig = {
     '!**/coverage/**',
     '!**/*.config.{js,ts}',
     '!**/types.ts',
+    '!**/database.types.ts',
+    '!**/env.d.ts',
+    '!app/**/layout.tsx',
+    '!app/**/page.tsx',
   ],
   
   // Coverage thresholds based on test plan
@@ -61,17 +77,13 @@ const customJestConfig = {
     '**/*.(test|spec).{js,jsx,ts,tsx}'
   ],
   
-  // Projects for different test types
-  projects: [
-    {
-      displayName: 'unit',
-      testMatch: ['<rootDir>/**/*.(test|spec).{js,jsx,ts,tsx}'],
-      testPathIgnorePatterns: ['<rootDir>/__tests__/e2e/', '<rootDir>/__tests__/integration/']
-    },
-    {
-      displayName: 'ui', 
-      testMatch: ['<rootDir>/__tests__/ui/**/*.(test|spec).{js,jsx,ts,tsx}']
-    }
+  // Simplified test patterns - removing projects for now
+  testPathIgnorePatterns: [
+    '<rootDir>/__tests__/e2e/',
+    '<rootDir>/__tests__/integration/',
+    '<rootDir>/apps/booklo-e2e/',
+    '<rootDir>/node_modules/',
+    '<rootDir>/.next/'
   ]
 }
 

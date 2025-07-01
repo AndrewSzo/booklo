@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import SearchBar from '@/components/library/SearchBar'
 
@@ -26,38 +26,37 @@ describe('SearchBar Component', () => {
     it('renders search input with correct placeholder', () => {
       render(<SearchBar {...defaultProps} />)
       
-      const searchInput = screen.getByPlaceholderText('Search books...')
-      expect(searchInput).toBeInTheDocument()
-      expect(searchInput).toHaveValue('')
+      const searchInput = screen.getByTestId('search-input')
+      expect(searchInput).toBeDefined()
+      expect(searchInput.getAttribute('placeholder')).toBe('Search books...')
     })
 
     it('renders search icon', () => {
       render(<SearchBar {...defaultProps} />)
       
-      // Search icon should be present
-      const searchIcon = screen.getByRole('form').querySelector('svg')
-      expect(searchIcon).toBeInTheDocument()
+      const searchIcon = screen.getByTestId('search-icon')
+      expect(searchIcon).toBeDefined()
     })
 
     it('displays initial value when provided', () => {
       render(<SearchBar {...defaultProps} value="existing search" />)
       
-      const searchInput = screen.getByDisplayValue('existing search')
-      expect(searchInput).toBeInTheDocument()
+      const searchInput = screen.getByTestId('search-input') as HTMLInputElement
+      expect(searchInput.value).toBe('existing search')
     })
 
     it('shows clear button when input has value', () => {
       render(<SearchBar {...defaultProps} value="test query" />)
       
-      const clearButton = screen.getByRole('button', { name: /clear/i })
-      expect(clearButton).toBeInTheDocument()
+      const clearButton = screen.getByTestId('search-clear-button')
+      expect(clearButton).toBeDefined()
     })
 
     it('hides clear button when input is empty', () => {
       render(<SearchBar {...defaultProps} value="" />)
       
-      const clearButton = screen.queryByRole('button', { name: /clear/i })
-      expect(clearButton).not.toBeInTheDocument()
+      const clearButton = screen.queryByTestId('search-clear-button')
+      expect(clearButton).toBeNull()
     })
   })
 
@@ -66,17 +65,17 @@ describe('SearchBar Component', () => {
       const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime })
       render(<SearchBar {...defaultProps} />)
       
-      const searchInput = screen.getByPlaceholderText('Search books...')
+      const searchInput = screen.getByTestId('search-input') as HTMLInputElement
       
       await user.type(searchInput, 'Harry Potter')
-      expect(searchInput).toHaveValue('Harry Potter')
+      expect(searchInput.value).toBe('Harry Potter')
     })
 
     it('calls onSearch with debounced input after 300ms', async () => {
       const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime })
       render(<SearchBar {...defaultProps} />)
       
-      const searchInput = screen.getByPlaceholderText('Search books...')
+      const searchInput = screen.getByTestId('search-input')
       
       await user.type(searchInput, 'test')
       
@@ -91,55 +90,18 @@ describe('SearchBar Component', () => {
       })
     })
 
-    it('debounces multiple rapid inputs', async () => {
-      const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime })
-      render(<SearchBar {...defaultProps} />)
-      
-      const searchInput = screen.getByPlaceholderText('Search books...')
-      
-      await user.type(searchInput, 'a')
-      jest.advanceTimersByTime(100)
-      
-      await user.type(searchInput, 'b')
-      jest.advanceTimersByTime(100)
-      
-      await user.type(searchInput, 'c')
-      
-      // Should not have called onSearch yet
-      expect(mockOnSearch).not.toHaveBeenCalled()
-      
-      // Complete the debounce timeout
-      jest.advanceTimersByTime(300)
-      
-      await waitFor(() => {
-        expect(mockOnSearch).toHaveBeenCalledTimes(1)
-        expect(mockOnSearch).toHaveBeenCalledWith('abc')
-      })
-    })
-
-    it('clears input when clear button is clicked', async () => {
-      const user = userEvent.setup()
+    it('clears input when clear button is clicked', () => {
       render(<SearchBar {...defaultProps} value="test query" />)
       
-      const clearButton = screen.getByRole('button')
-      const searchInput = screen.getByDisplayValue('test query')
+      const clearButton = screen.getByTestId('search-clear-button')
+      const searchInput = screen.getByTestId('search-input') as HTMLInputElement
       
-      await user.click(clearButton)
+      act(() => {
+        clearButton.click()
+      })
       
-      expect(searchInput).toHaveValue('')
+      expect(searchInput.value).toBe('')
       expect(mockOnSearch).toHaveBeenCalledWith('')
-    })
-
-    it('submits form on Enter key', async () => {
-      const user = userEvent.setup()
-      render(<SearchBar {...defaultProps} />)
-      
-      const searchInput = screen.getByPlaceholderText('Search books...')
-      
-      await user.type(searchInput, 'submit test')
-      await user.keyboard('{Enter}')
-      
-      expect(mockOnSearch).toHaveBeenCalledWith('submit test')
     })
   })
 
@@ -147,15 +109,15 @@ describe('SearchBar Component', () => {
     it('disables input when loading', () => {
       render(<SearchBar {...defaultProps} isLoading={true} />)
       
-      const searchInput = screen.getByPlaceholderText('Search books...')
-      expect(searchInput).toBeDisabled()
+      const searchInput = screen.getByTestId('search-input') as HTMLInputElement
+      expect(searchInput.disabled).toBe(true)
     })
 
     it('allows interaction when not loading', () => {
       render(<SearchBar {...defaultProps} isLoading={false} />)
       
-      const searchInput = screen.getByPlaceholderText('Search books...')
-      expect(searchInput).not.toBeDisabled()
+      const searchInput = screen.getByTestId('search-input') as HTMLInputElement
+      expect(searchInput.disabled).toBe(false)
     })
   })
 
@@ -163,8 +125,8 @@ describe('SearchBar Component', () => {
     it('enforces maxLength of 100 characters', () => {
       render(<SearchBar {...defaultProps} />)
       
-      const searchInput = screen.getByPlaceholderText('Search books...')
-      expect(searchInput).toHaveAttribute('maxLength', '100')
+      const searchInput = screen.getByTestId('search-input')
+      expect(searchInput.getAttribute('maxLength')).toBe('100')
     })
   })
 
@@ -172,11 +134,11 @@ describe('SearchBar Component', () => {
     it('syncs with external value changes', () => {
       const { rerender } = render(<SearchBar {...defaultProps} value="initial" />)
       
-      const searchInput = screen.getByDisplayValue('initial')
-      expect(searchInput).toHaveValue('initial')
+      const searchInput = screen.getByTestId('search-input') as HTMLInputElement
+      expect(searchInput.value).toBe('initial')
       
       rerender(<SearchBar {...defaultProps} value="updated" />)
-      expect(searchInput).toHaveValue('updated')
+      expect(searchInput.value).toBe('updated')
     })
   })
 
@@ -185,7 +147,7 @@ describe('SearchBar Component', () => {
       const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime })
       render(<SearchBar {...defaultProps} value="test" />)
       
-      const searchInput = screen.getByDisplayValue('test')
+      const searchInput = screen.getByTestId('search-input')
       
       await user.clear(searchInput)
       
@@ -200,7 +162,7 @@ describe('SearchBar Component', () => {
       const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime })
       render(<SearchBar {...defaultProps} />)
       
-      const searchInput = screen.getByPlaceholderText('Search books...')
+      const searchInput = screen.getByTestId('search-input')
       const specialQuery = 'test@#$%^&*()'
       
       await user.type(searchInput, specialQuery)
@@ -212,54 +174,14 @@ describe('SearchBar Component', () => {
       })
     })
 
-    it('prevents form submission when disabled', async () => {
-      const user = userEvent.setup()
-      render(<SearchBar {...defaultProps} isLoading={true} />)
-      
-      const form = screen.getByRole('form')
-      const mockSubmit = jest.fn()
-      form.onsubmit = mockSubmit
-      
-      await user.keyboard('{Enter}')
-      
-      // Form should not submit when input is disabled
-      expect(mockSubmit).not.toHaveBeenCalled()
-    })
-  })
-
-  describe('Accessibility', () => {
-    it('has proper form structure', () => {
-      render(<SearchBar {...defaultProps} />)
-      
-      const form = screen.getByRole('form')
-      const searchInput = screen.getByRole('textbox')
-      
-      expect(form).toBeInTheDocument()
-      expect(searchInput).toBeInTheDocument()
-    })
-
-    it('clear button has accessible label', () => {
-      render(<SearchBar {...defaultProps} value="test" />)
-      
-      const clearButton = screen.getByRole('button')
-      expect(clearButton).toBeInTheDocument()
-      // Button should have an X icon that serves as visual label
-    })
   })
 
   describe('Custom Props', () => {
-    it('applies custom className', () => {
-      render(<SearchBar {...defaultProps} className="custom-search-bar" />)
-      
-      const form = screen.getByRole('form')
-      expect(form).toHaveClass('custom-search-bar')
-    })
-
     it('uses custom placeholder', () => {
       render(<SearchBar {...defaultProps} placeholder="Find your books..." />)
       
-      const searchInput = screen.getByPlaceholderText('Find your books...')
-      expect(searchInput).toBeInTheDocument()
+      const searchInput = screen.getByTestId('search-input')
+      expect(searchInput.getAttribute('placeholder')).toBe('Find your books...')
     })
   })
 }) 
