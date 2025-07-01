@@ -12,7 +12,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { User, Settings, LogOut, ChevronDown, Loader2 } from 'lucide-react'
 import { useAuth } from '@/lib/providers/AuthProvider'
-import { signOutAction } from '@/lib/actions/auth'
 
 export default function AuthButton() {
   const { user, isAuthenticated, isLoading } = useAuth()
@@ -22,8 +21,16 @@ export default function AuthButton() {
   const handleLogout = () => {
     startTransition(async () => {
       try {
-        await signOutAction()
-        setIsOpen(false)
+        const response = await fetch('/api/auth/logout', {
+          method: 'POST',
+        })
+
+        if (response.ok) {
+          setIsOpen(false)
+          window.location.href = '/'
+        } else {
+          console.error('Failed to logout')
+        }
       } catch (error) {
         console.error('Error logging out:', error)
       }

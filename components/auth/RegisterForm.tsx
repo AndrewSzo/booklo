@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { registerSchema, type RegisterFormData } from '@/lib/validations/auth'
-import { signUpAction } from '@/lib/actions/auth'
 import AuthError from './AuthError'
 import { Eye, EyeOff, Loader2, CheckCircle } from 'lucide-react'
 
@@ -36,17 +35,27 @@ export default function RegisterForm() {
     
     startTransition(async () => {
       try {
-        const formData = new FormData()
-        formData.append('email', data.email)
-        formData.append('password', data.password)
-        formData.append('confirmPassword', data.confirmPassword)
+        const response = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: data.email,
+            password: data.password,
+            confirmPassword: data.confirmPassword,
+          }),
+        })
+
+        const result = await response.json()
         
-        const result = await signUpAction(formData)
+        if (!response.ok || result.error) {
+          setAuthError(result.error || 'Wystąpił błąd podczas rejestracji')
+          return
+        }
         
-        if (result?.error) {
-          setAuthError(result.error)
-        } else {
-          setSuccessMessage('Konto zostało utworzone! Sprawdź swoją skrzynkę pocztową, aby potwierdzić email.')
+        if (result.success) {
+          setSuccessMessage(result.success)
         }
         
       } catch {
