@@ -2,7 +2,7 @@
 
 ## Option 1: OpenNext Cloudflare (Recommended)
 
-This is the modern approach using `@opennextjs/cloudflare`.
+This is the modern approach using `@opennextjs/cloudflare` v1.3.1 and `wrangler` v4.
 
 ### Local Development & Deployment
 
@@ -39,24 +39,12 @@ This is the modern approach using `@opennextjs/cloudflare`.
 
 **Compatibility Settings:**
 - Go to Settings > Functions > Compatibility Flags
-- Add `nodejs_compat` flag for both production and preview
+- Add `nodejs_compat_populate_process_env` flag for both production and preview
 - Set Compatibility Date to `2025-01-01` or later
 
-## Option 2: Traditional next-on-pages
+## Option 2: Traditional next-on-pages (Fallback)
 
-Alternative approach using `@cloudflare/next-on-pages`.
-
-### Local Development & Deployment
-
-1. **Build for Cloudflare:**
-   ```bash
-   npm run pages:build:traditional
-   ```
-
-2. **Preview locally:**
-   ```bash
-   npm run preview:traditional
-   ```
+If Option 1 fails, use this traditional approach.
 
 ### Cloudflare Dashboard Settings
 
@@ -65,26 +53,42 @@ Alternative approach using `@cloudflare/next-on-pages`.
 - **Deploy command:** Leave empty or `echo "Deploy completed"`
 - **Build output directory:** `.vercel/output/static`
 
+## Option 3: Simple Next.js Build (Last Resort)
+
+If both above options fail:
+
+### Cloudflare Dashboard Settings
+
+**For Git integration:**
+- **Build command:** `npm run build`
+- **Deploy command:** Leave empty
+- **Build output directory:** `.next`
+
 ## Troubleshooting
 
 ### Common Issues:
 
-1. **"Missing entry-point" error:**
+1. **Dependency conflicts:**
+   - The project includes `.npmrc` with `legacy-peer-deps=true`
+   - This should resolve wrangler version conflicts
+
+2. **"Missing entry-point" error:**
    - Use the correct build commands above
    - Don't use `npx wrangler deploy` alone
 
-2. **"Invalid request body" in Cloudflare Dashboard:**
+3. **"Invalid request body" in Cloudflare Dashboard:**
    - Try leaving Deploy command empty
    - Or use `echo "Deploy completed"`
 
-3. **Build errors:**
+4. **Build errors:**
    - Ensure `NODE_VERSION` is set to 18+
-   - Add `nodejs_compat` compatibility flag
+   - Add `nodejs_compat_populate_process_env` compatibility flag
 
 ### Environment Variables
 
 Make sure to set these in Cloudflare Dashboard:
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY`
-- Any other environment variables your app needs 
+- `NEXT_PUBLIC_SITE_URL`
+- `OPENAI_API_KEY` (if using AI features)
+- `NODE_VERSION` = `18` 

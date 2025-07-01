@@ -2,4 +2,9 @@ name = "booklo"
 compatibility_date = "2025-01-01"
 compatibility_flags = [ "nodejs_compat" ]
 
-pages_build_output_dir = ".vercel/output/static" 
+# For @opennextjs/cloudflare
+pages_build_output_dir = ".vercel/output/static"
+
+# Alternative configuration for traditional next-on-pages
+# If using @cloudflare/next-on-pages, uncomment this instead:
+# pages_build_output_dir = ".vercel/output/static" 
