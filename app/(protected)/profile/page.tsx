@@ -3,6 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { User, Mail, Calendar, Settings } from 'lucide-react'
 
+export const runtime = 'edge'
+
 export default async function ProfilePage() {
   const supabase = await createClient()
   

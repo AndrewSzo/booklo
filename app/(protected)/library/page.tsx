@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server'
 import { AppLayout } from '@/components/layout/AppLayout'
 import LibraryView from '@/components/library/LibraryView'
 
+export const runtime = 'edge'
+
 export default async function LibraryPage() {
   const supabase = await createClient()
   

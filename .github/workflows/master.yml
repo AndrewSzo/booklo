@@ -55,7 +55,7 @@ jobs:
         uses: ./.github/actions/setup-node-deps
 
       - name: Build Next.js application for Cloudflare
-        run: npm run pages:build
+        run: npm run pages:build:traditional
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
