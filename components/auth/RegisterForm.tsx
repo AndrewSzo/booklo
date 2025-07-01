@@ -50,7 +50,9 @@ export default function RegisterForm() {
         const result = await response.json()
         
         if (!response.ok || result.error) {
-          setAuthError(result.error || 'Wystąpił błąd podczas rejestracji')
+          const errorMessage = result.error || `Błąd ${response.status}: ${response.statusText}`
+          console.error('Registration failed:', { status: response.status, error: result.error })
+          setAuthError(errorMessage)
           return
         }
         
