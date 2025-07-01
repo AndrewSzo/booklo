@@ -14,7 +14,7 @@ import {
   type ResetPasswordFormData,
   type NewPasswordFormData 
 } from '@/lib/validations/auth'
-import { resetPasswordAction, updatePasswordAction } from '@/lib/actions/auth'
+
 import AuthError from './AuthError'
 import { Eye, EyeOff, Loader2, CheckCircle, ArrowLeft } from 'lucide-react'
 
@@ -56,14 +56,24 @@ export default function ResetPasswordForm({ mode = 'request' }: ResetPasswordFor
     
     startTransition(async () => {
       try {
-        const formData = new FormData()
-        formData.append('email', data.email)
+        const response = await fetch('/api/auth/reset-password', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: data.email,
+          }),
+        })
+
+        const result = await response.json()
         
-        const result = await resetPasswordAction(formData)
+        if (!response.ok || result.error) {
+          setAuthError(result.error || 'Wystąpił błąd podczas wysyłania linku')
+          return
+        }
         
-        if (result?.error) {
-          setAuthError(result.error)
-        } else if (result?.success) {
+        if (result.success) {
           setSuccessMessage(result.success)
         }
         
@@ -79,16 +89,26 @@ export default function ResetPasswordForm({ mode = 'request' }: ResetPasswordFor
     
     startTransition(async () => {
       try {
-        const formData = new FormData()
-        formData.append('password', data.password)
-        formData.append('confirmPassword', data.confirmPassword)
+        const response = await fetch('/api/auth/update-password', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            password: data.password,
+            confirmPassword: data.confirmPassword,
+          }),
+        })
+
+        const result = await response.json()
         
-        const result = await updatePasswordAction(formData)
-        
-        if (result?.error) {
-          setAuthError(result.error)
+        if (!response.ok || result.error) {
+          setAuthError(result.error || 'Wystąpił błąd podczas zmiany hasła')
+          return
         }
-        // Success case will redirect automatically via Server Action
+        
+        // Redirect to dashboard on success
+        window.location.href = '/dashboard'
         
       } catch {
         setAuthError('Wystąpił błąd podczas zmiany hasła. Spróbuj ponownie.')

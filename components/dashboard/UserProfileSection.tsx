@@ -4,7 +4,6 @@ import { useTransition } from 'react'
 import { User, Settings, LogOut, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/lib/providers/AuthProvider'
-import { signOutAction } from '@/lib/actions/auth'
 
 export default function UserProfileSection() {
   const { user } = useAuth()
@@ -13,7 +12,15 @@ export default function UserProfileSection() {
   const handleLogout = () => {
     startTransition(async () => {
       try {
-        await signOutAction()
+        const response = await fetch('/api/auth/logout', {
+          method: 'POST',
+        })
+
+        if (response.ok) {
+          window.location.href = '/'
+        } else {
+          console.error('Failed to logout')
+        }
       } catch (error) {
         console.error('Błąd podczas wylogowywania:', error)
       }

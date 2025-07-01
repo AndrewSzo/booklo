@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { loginSchema, type LoginFormData } from '@/lib/validations/auth'
-import { signInAction } from '@/lib/actions/auth'
 import AuthError from './AuthError'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 
@@ -33,16 +32,27 @@ export default function LoginForm() {
     
     startTransition(async () => {
       try {
-        const formData = new FormData()
-        formData.append('email', data.email)
-        formData.append('password', data.password)
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: data.email,
+            password: data.password,
+          }),
+        })
+
+        const result = await response.json()
         
-        const result = await signInAction(formData)
-        
-        if (result?.error) {
-          setAuthError(result.error)
+        if (!response.ok || result.error) {
+          setAuthError(result.error || 'Wystąpił błąd podczas logowania')
+          return
         }
-        // Success case will redirect automatically via Server Action
+        
+        // Redirect to dashboard on success
+        const redirectTo = searchParams.get('redirectTo') || '/dashboard'
+        window.location.href = redirectTo
         
       } catch {
         setAuthError('Wystąpił błąd podczas logowania. Spróbuj ponownie.')
