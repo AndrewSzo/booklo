@@ -22,4 +22,4 @@
 
 ## CI/CD and Hosting
 - **GitHub Actions** - For creating CI/CD pipelines
-- **DigitalOcean** - For application hosting via Docker image
+- **Cloudflare Pages** - For Next.js application hosting
