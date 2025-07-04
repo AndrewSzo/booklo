@@ -71,33 +71,43 @@ export default function BookCard({ book, onClick, variant = 'compact', 'data-tes
                   data-testid="book-cover-image"
                 />
               ) : (
-                <div className="text-2xl" data-testid="book-cover-placeholder">📖</div>
+                <div className="w-full h-full bg-gradient-to-br from-emerald-400 via-teal-500 to-blue-600 rounded-md flex flex-col items-center justify-center text-white shadow-inner" data-testid="book-cover-placeholder">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mb-2 opacity-90">
+                    <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+                    <path d="M8 7h8"/>
+                    <path d="M8 11h8"/>
+                  </svg>
+                  <span className="text-xs font-medium opacity-75 text-center px-2">Brak okładki</span>
+                </div>
               )}
             </div>
 
             {/* Book info on the right */}
-            <div className="flex-1 space-y-2 min-w-0">
-              <h4 className="font-medium text-lg text-foreground line-clamp-2 leading-tight" data-testid="book-title">
-                {book.title}
-              </h4>
-              
-              <div className="flex items-center gap-1 text-sm text-muted-foreground" data-testid="book-author">
-                <User className="h-4 w-4 flex-shrink-0" />
-                <span className="truncate">{book.author}</span>
+            <div className="flex-1 flex flex-col justify-between min-w-0">
+              <div className="space-y-3">
+                <div>
+                  <h4 className="font-semibold text-lg text-foreground leading-tight mb-1" data-testid="book-title">
+                    {book.title}
+                  </h4>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground" data-testid="book-author">
+                    <User className="h-4 w-4 flex-shrink-0" />
+                    <span className="truncate">{book.author}</span>
+                  </div>
+                </div>
+
+                {book.category && (
+                  <div className="flex items-center gap-2" data-testid="book-category">
+                    <Tag className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+                    <span className="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-medium">
+                      {book.category}
+                    </span>
+                  </div>
+                )}
+
+                {book.user_rating && renderStars(book.user_rating)}
               </div>
 
-              {book.category && (
-                <div className="flex items-center gap-1 text-sm text-muted-foreground" data-testid="book-category">
-                  <Tag className="h-4 w-4 flex-shrink-0" />
-                  <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
-                    {book.category}
-                  </span>
-                </div>
-              )}
-
-              {book.user_rating && renderStars(book.user_rating)}
-
-              <div className="flex items-center gap-1 text-sm text-muted-foreground" data-testid="book-date">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground mt-3" data-testid="book-date">
                 <Calendar className="h-4 w-4 flex-shrink-0" />
                 <span>{formatDate(book.created_at)}</span>
               </div>
@@ -127,29 +137,38 @@ export default function BookCard({ book, onClick, variant = 'compact', 'data-tes
                 data-testid="book-cover-image"
               />
             ) : (
-              <div className="text-2xl" data-testid="book-cover-placeholder">📖</div>
+              <div className="w-full h-full bg-gradient-to-br from-emerald-400 via-teal-500 to-blue-600 rounded flex flex-col items-center justify-center text-white shadow-inner" data-testid="book-cover-placeholder">
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mb-2 opacity-90">
+                  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+                  <path d="M8 7h8"/>
+                  <path d="M8 11h8"/>
+                </svg>
+                <span className="text-xs font-medium opacity-75 text-center px-2">Brak okładki</span>
+              </div>
             )}
           </div>
 
           {/* Book details */}
-          <div className="flex-1 space-y-2">
-            <div>
-              <h4 className="font-medium text-foreground line-clamp-2" data-testid="book-title">{book.title}</h4>
-              <p className="text-sm text-muted-foreground" data-testid="book-author">{book.author}</p>
+          <div className="flex-1 flex flex-col justify-between">
+            <div className="space-y-3">
+              <div>
+                <h4 className="font-semibold text-foreground leading-tight mb-1" data-testid="book-title">{book.title}</h4>
+                <p className="text-sm text-muted-foreground" data-testid="book-author">{book.author}</p>
+              </div>
+
+              {book.category && (
+                <div className="flex items-center gap-2" data-testid="book-category">
+                  <Tag className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+                  <span className="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-medium">
+                    {book.category}
+                  </span>
+                </div>
+              )}
+
+              {book.user_rating && renderStars(book.user_rating)}
             </div>
 
-            {book.category && (
-              <div className="flex items-center gap-1 text-sm text-muted-foreground" data-testid="book-category">
-                <Tag className="h-4 w-4 flex-shrink-0" />
-                <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
-                  {book.category}
-                </span>
-              </div>
-            )}
-
-            {book.user_rating && renderStars(book.user_rating)}
-
-            <div className="flex items-center justify-between text-xs text-muted-foreground" data-testid="book-metadata">
+            <div className="flex items-center justify-between text-xs text-muted-foreground mt-3" data-testid="book-metadata">
               <span data-testid="book-date">{formatDate(book.created_at)}</span>
               {book.notes_count > 0 && (
                 <span data-testid="book-notes-count">{book.notes_count} notes</span>
