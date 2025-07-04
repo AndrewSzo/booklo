@@ -125,5 +125,3 @@ This project is currently in development (version 0.1.0). The MVP is being devel
 ## License
 
 This project is private and proprietary. All rights reserved.
-
-fds
