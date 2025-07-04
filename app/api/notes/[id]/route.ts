@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 export const runtime = 'edge'
-import { createClient } from '@/lib/supabase/server'
+import { createClientForEdge } from '@/lib/supabase/server'
 import type { 
   UpdateNoteDTO, 
   UpdateNoteResponseDTO,
@@ -109,7 +109,8 @@ export async function PUT(
     }
 
     // Uwierzytelnianie
-    const supabase = await createClient()
+    const tempResponse = NextResponse.json({ data: null }, { status: 200 })
+    const supabase = createClientForEdge(request, tempResponse)
     const { data: { user }, error: authError } = await supabase.auth.getUser()
 
     if (authError || !user) {
@@ -202,7 +203,8 @@ export async function DELETE(
     }
 
     // Uwierzytelnianie
-    const supabase = await createClient()
+    const tempResponse2 = NextResponse.json({ data: null }, { status: 204 })
+    const supabase = createClientForEdge(request, tempResponse2)
     const { data: { user }, error: authError } = await supabase.auth.getUser()
 
     if (authError || !user) {

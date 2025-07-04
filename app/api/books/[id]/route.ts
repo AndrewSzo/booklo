@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 export const runtime = 'edge'
-import { createClient } from '@/lib/supabase/server'
+import { createClientForEdge } from '@/lib/supabase/server'
 import { validateUpdateBook } from '@/lib/validations/book.schema'
-import { requireAuthentication } from '@/lib/utils/auth'
+import { requireAuthenticationForEdge } from '@/lib/utils/auth'
 import { BookService } from '@/lib/services/book.service'
 import type { 
   UpdateBookResponseDTO, 
@@ -90,10 +90,13 @@ export async function PUT(
       return addSecurityHeaders(NextResponse.json(errorResponse, { status: 400 }))
     }
 
+    // Create response first for edge runtime compatibility
+    const response = NextResponse.json({ data: null }, { status: 200 })
+
     // Step 4: Check authentication
     let userId: string
     try {
-      userId = await requireAuthentication()
+      userId = await requireAuthenticationForEdge(request, response)
     } catch (authError: unknown) {
       console.error('Authentication failed:', authError)
       const error = authError as TypedError
@@ -108,7 +111,7 @@ export async function PUT(
     }
 
     // Step 5: Initialize services and update book
-    const supabase = await createClient()
+    const supabase = createClientForEdge(request, response)
     const bookService = new BookService(supabase)
 
     try {
@@ -201,10 +204,13 @@ export async function GET(
       return addSecurityHeaders(NextResponse.json(errorResponse, { status: 400 }))
     }
 
+    // Create response first for edge runtime compatibility
+    const response = NextResponse.json({ data: null }, { status: 200 })
+
     // Step 2: Check authentication
     let userId: string
     try {
-      userId = await requireAuthentication()
+      userId = await requireAuthenticationForEdge(request, response)
     } catch (authError: unknown) {
       console.error('Authentication failed:', authError)
       const error = authError as TypedError
@@ -219,7 +225,7 @@ export async function GET(
     }
 
     // Step 3: Initialize services and get book details
-    const supabase = await createClient()
+    const supabase = createClientForEdge(request, response)
     const bookService = new BookService(supabase)
 
     try {
@@ -291,10 +297,13 @@ export async function DELETE(
       return addSecurityHeaders(NextResponse.json(errorResponse, { status: 400 }))
     }
 
+    // Create response first for edge runtime compatibility  
+    const response = NextResponse.json({ data: null }, { status: 200 })
+
     // Step 2: Check authentication
     let userId: string
     try {
-      userId = await requireAuthentication()
+      userId = await requireAuthenticationForEdge(request, response)
     } catch (authError: unknown) {
       console.error('Authentication failed:', authError)
       const error = authError as TypedError
@@ -309,7 +318,7 @@ export async function DELETE(
     }
 
     // Step 3: Initialize services and delete book
-    const supabase = await createClient()
+    const supabase = createClientForEdge(request, response)
     const bookService = new BookService(supabase)
 
     try {
