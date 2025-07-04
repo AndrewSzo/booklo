@@ -32,7 +32,7 @@ export default function BookCard({ book, onClick, variant = 'compact', 'data-tes
         {Array.from({ length: 5 }).map((_, i) => (
           <Star
             key={i}
-            className={`h-4 w-4 ${
+            className={`h-3 w-3 sm:h-4 sm:w-4 ${
               i < rating 
                 ? 'fill-yellow-400 text-yellow-400' 
                 : 'text-muted-foreground'
@@ -40,7 +40,7 @@ export default function BookCard({ book, onClick, variant = 'compact', 'data-tes
             data-testid={`star-${i}`}
           />
         ))}
-        <span className="text-sm text-muted-foreground ml-1" data-testid="rating-value">{rating}</span>
+        <span className="text-xs sm:text-sm text-muted-foreground ml-1" data-testid="rating-value">{rating}</span>
       </div>
     )
   }
@@ -59,10 +59,10 @@ export default function BookCard({ book, onClick, variant = 'compact', 'data-tes
         onClick={handleClick}
         data-testid={testId || "book-card"}
       >
-        <CardContent className="p-4">
-          <div className="flex gap-4">
+        <CardContent className="p-3 sm:p-4">
+          <div className="flex gap-3 md:gap-4">
             {/* Cover on the left */}
-            <div className="w-40 h-56 bg-muted rounded-md flex items-center justify-center flex-shrink-0 overflow-hidden" data-testid="book-cover">
+            <div className="w-24 h-32 sm:w-32 sm:h-44 lg:w-36 lg:h-48 xl:w-40 xl:h-56 bg-muted rounded-md flex items-center justify-center flex-shrink-0 overflow-hidden" data-testid="book-cover">
               {book.cover_url ? (
                 <img 
                   src={book.cover_url} 
@@ -72,33 +72,33 @@ export default function BookCard({ book, onClick, variant = 'compact', 'data-tes
                 />
               ) : (
                 <div className="w-full h-full bg-gradient-to-br from-emerald-400 via-teal-500 to-blue-600 rounded-md flex flex-col items-center justify-center text-white shadow-inner" data-testid="book-cover-placeholder">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mb-2 opacity-90">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 mb-1 sm:mb-2 opacity-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
                     <path d="M8 7h8"/>
                     <path d="M8 11h8"/>
                   </svg>
-                  <span className="text-xs font-medium opacity-75 text-center px-2">Brak okładki</span>
+                  <span className="text-xs font-medium opacity-75 text-center px-1 sm:px-2 hidden sm:block">Brak okładki</span>
                 </div>
               )}
             </div>
 
             {/* Book info on the right */}
             <div className="flex-1 flex flex-col justify-between min-w-0">
-              <div className="space-y-3">
+              <div className="space-y-2 md:space-y-3">
                 <div>
-                  <h4 className="font-semibold text-lg text-foreground leading-tight mb-1" data-testid="book-title">
+                  <h4 className="font-semibold text-sm sm:text-base lg:text-lg text-foreground leading-tight mb-1" data-testid="book-title">
                     {book.title}
                   </h4>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground" data-testid="book-author">
-                    <User className="h-4 w-4 flex-shrink-0" />
+                  <div className="flex items-center gap-1.5 text-xs sm:text-sm text-muted-foreground" data-testid="book-author">
+                    <User className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                     <span className="truncate">{book.author}</span>
                   </div>
                 </div>
 
                 {book.category && (
-                  <div className="flex items-center gap-2" data-testid="book-category">
-                    <Tag className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
-                    <span className="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-medium">
+                  <div className="flex items-center gap-1.5" data-testid="book-category">
+                    <Tag className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0 text-muted-foreground" />
+                    <span className="px-2 py-0.5 sm:px-3 sm:py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-medium">
                       {book.category}
                     </span>
                   </div>
@@ -107,8 +107,8 @@ export default function BookCard({ book, onClick, variant = 'compact', 'data-tes
                 {book.user_rating && renderStars(book.user_rating)}
               </div>
 
-              <div className="flex items-center gap-2 text-sm text-muted-foreground mt-3" data-testid="book-date">
-                <Calendar className="h-4 w-4 flex-shrink-0" />
+              <div className="flex items-center gap-1.5 text-xs sm:text-sm text-muted-foreground mt-2 md:mt-3" data-testid="book-date">
+                <Calendar className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                 <span>{formatDate(book.created_at)}</span>
               </div>
             </div>
@@ -125,10 +125,10 @@ export default function BookCard({ book, onClick, variant = 'compact', 'data-tes
       onClick={handleClick}
       data-testid={testId || "book-card"}
     >
-      <CardContent className="p-4">
-        <div className="flex gap-4">
+      <CardContent className="p-3 sm:p-4">
+        <div className="flex gap-3 md:gap-4">
           {/* Cover */}
-          <div className="w-40 h-56 bg-muted rounded flex items-center justify-center flex-shrink-0 overflow-hidden" data-testid="book-cover">
+          <div className="w-24 h-32 sm:w-32 sm:h-44 lg:w-36 lg:h-48 xl:w-40 xl:h-56 bg-muted rounded flex items-center justify-center flex-shrink-0 overflow-hidden" data-testid="book-cover">
             {book.cover_url ? (
               <img 
                 src={book.cover_url} 
@@ -138,28 +138,28 @@ export default function BookCard({ book, onClick, variant = 'compact', 'data-tes
               />
             ) : (
               <div className="w-full h-full bg-gradient-to-br from-emerald-400 via-teal-500 to-blue-600 rounded flex flex-col items-center justify-center text-white shadow-inner" data-testid="book-cover-placeholder">
-                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mb-2 opacity-90">
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 mb-1 sm:mb-2 opacity-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
                   <path d="M8 7h8"/>
                   <path d="M8 11h8"/>
                 </svg>
-                <span className="text-xs font-medium opacity-75 text-center px-2">Brak okładki</span>
+                <span className="text-xs font-medium opacity-75 text-center px-1 sm:px-2 hidden sm:block">Brak okładki</span>
               </div>
             )}
           </div>
 
           {/* Book details */}
           <div className="flex-1 flex flex-col justify-between">
-            <div className="space-y-3">
+            <div className="space-y-2 md:space-y-3">
               <div>
-                <h4 className="font-semibold text-foreground leading-tight mb-1" data-testid="book-title">{book.title}</h4>
-                <p className="text-sm text-muted-foreground" data-testid="book-author">{book.author}</p>
+                <h4 className="font-semibold text-sm sm:text-base lg:text-lg text-foreground leading-tight mb-1" data-testid="book-title">{book.title}</h4>
+                <p className="text-xs sm:text-sm text-muted-foreground" data-testid="book-author">{book.author}</p>
               </div>
 
               {book.category && (
-                <div className="flex items-center gap-2" data-testid="book-category">
-                  <Tag className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
-                  <span className="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-medium">
+                <div className="flex items-center gap-1.5" data-testid="book-category">
+                  <Tag className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0 text-muted-foreground" />
+                  <span className="px-2 py-0.5 sm:px-3 sm:py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-medium">
                     {book.category}
                   </span>
                 </div>
@@ -168,7 +168,7 @@ export default function BookCard({ book, onClick, variant = 'compact', 'data-tes
               {book.user_rating && renderStars(book.user_rating)}
             </div>
 
-            <div className="flex items-center justify-between text-xs text-muted-foreground mt-3" data-testid="book-metadata">
+            <div className="flex items-center justify-between text-xs text-muted-foreground mt-2 md:mt-3" data-testid="book-metadata">
               <span data-testid="book-date">{formatDate(book.created_at)}</span>
               {book.notes_count > 0 && (
                 <span data-testid="book-notes-count">{book.notes_count} notes</span>
