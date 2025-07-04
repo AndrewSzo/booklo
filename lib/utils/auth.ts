@@ -1,4 +1,5 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createClientForEdge } from '@/lib/supabase/server'
+import { NextRequest, NextResponse } from 'next/server'
 import type { ErrorResponseDTO } from '@/lib/types'
 
 export interface AuthResult {
@@ -62,11 +63,75 @@ export async function checkAuthentication(): Promise<AuthResult> {
 }
 
 /**
+ * Edge Runtime compatible authentication check
+ */
+export async function checkAuthenticationForEdge(request: NextRequest, response: NextResponse): Promise<AuthResult> {
+  try {
+    const supabase = createClientForEdge(request, response)
+    
+    const { data: { user }, error } = await supabase.auth.getUser()
+    
+    if (error) {
+      console.error('Authentication error:', error)
+      return {
+        success: false,
+        error: {
+          message: 'Authentication failed',
+          code: 'AUTH_ERROR',
+          details: { auth_error: error.message }
+        }
+      }
+    }
+    
+    if (!user) {
+      return {
+        success: false,
+        error: {
+          message: 'User not authenticated',
+          code: 'UNAUTHORIZED'
+        }
+      }
+    }
+    
+    return {
+      success: true,
+      userId: user.id
+    }
+  } catch (error) {
+    console.error('Unexpected authentication error:', error)
+    return {
+      success: false,
+      error: {
+        message: 'Authentication check failed',
+        code: 'AUTH_CHECK_FAILED'
+      }
+    }
+  }
+}
+
+/**
  * Middleware-like function to handle authentication for API routes
  * Returns user ID if authenticated, or throws an error with appropriate HTTP status
  */
 export async function requireAuthentication(): Promise<string> {
   const authResult = await checkAuthentication()
+  
+  if (!authResult.success) {
+    const error = new Error(authResult.error?.message || 'Authentication required') as AuthError
+    error.status = 401
+    error.code = authResult.error?.code || 'UNAUTHORIZED'
+    error.details = authResult.error?.details
+    throw error
+  }
+  
+  return authResult.userId!
+}
+
+/**
+ * Edge Runtime compatible authentication middleware
+ */
+export async function requireAuthenticationForEdge(request: NextRequest, response: NextResponse): Promise<string> {
+  const authResult = await checkAuthenticationForEdge(request, response)
   
   if (!authResult.success) {
     const error = new Error(authResult.error?.message || 'Authentication required') as AuthError

@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 export const runtime = 'edge'
-import { createClient } from '@/lib/supabase/server'
+import { createClientForEdge } from '@/lib/supabase/server'
 import { validateCreateBook, validateBookQuery } from '@/lib/validations/book.schema'
-import { requireAuthentication } from '@/lib/utils/auth'
+import { requireAuthenticationForEdge } from '@/lib/utils/auth'
 import { BookService } from '@/lib/services/book.service'
 import type { 
-  CreateBookResponseDTO, 
   ErrorResponseDTO, 
-  ValidationErrorResponseDTO,
-  BookListResponseDTO
+  ValidationErrorResponseDTO
 } from '@/lib/types'
 
 interface TypedError {
@@ -57,10 +55,13 @@ export async function POST(request: NextRequest) {
       return addSecurityHeaders(NextResponse.json(errorResponse, { status: 400 }))
     }
 
-    // Step 3: Check authentication
+    // Create response first for edge runtime compatibility
+    const response = NextResponse.json({ data: null }, { status: 201 })
+
+    // Step 3: Check authentication with edge runtime support
     let userId: string
     try {
-      userId = await requireAuthentication()
+      userId = await requireAuthenticationForEdge(request, response)
     } catch (authError: unknown) {
       console.error('Authentication failed:', authError)
       const error = authError as TypedError
@@ -74,19 +75,18 @@ export async function POST(request: NextRequest) {
       return addSecurityHeaders(NextResponse.json(errorResponse, { status: error.status || 401 }))
     }
 
-    // Step 4: Initialize services
-    const supabase = await createClient()
+    // Step 4: Initialize services with edge runtime support
+    const supabase = createClientForEdge(request, response)
     const bookService = new BookService(supabase)
 
     // Step 5: Create book with related data
     try {
       const result = await bookService.createBookWithRelatedData(validationResult.data, userId)
       
-      const response: CreateBookResponseDTO = {
+      // Update response with actual data
+      return addSecurityHeaders(NextResponse.json({
         data: result.book
-      }
-
-      return addSecurityHeaders(NextResponse.json(response, { status: 201 }))
+      }, { status: 201 }))
     } catch (serviceError: unknown) {
       console.error('Book service error:', serviceError)
       const error = serviceError as TypedError
@@ -132,10 +132,13 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    // Step 1: Check authentication
+    // Create response first for edge runtime compatibility
+    const response = NextResponse.json({ data: [], pagination: {} }, { status: 200 })
+
+    // Step 1: Check authentication with edge runtime support
     let userId: string
     try {
-      userId = await requireAuthentication()
+      userId = await requireAuthenticationForEdge(request, response)
     } catch (authError: unknown) {
       console.error('Authentication failed:', authError)
       const error = authError as TypedError
@@ -174,22 +177,18 @@ export async function GET(request: NextRequest) {
       return addSecurityHeaders(NextResponse.json(errorResponse, { status: 400 }))
     }
 
-    // Step 3: Initialize services and get books
-    const supabase = await createClient()
+    // Step 3: Initialize services with edge runtime support
+    const supabase = createClientForEdge(request, response)
     const bookService = new BookService(supabase)
     
     try {
       const result = await bookService.getBooks(validationResult.data, userId)
       
-      const response: BookListResponseDTO = {
+      // Return updated response with actual data
+      return addSecurityHeaders(NextResponse.json({
         data: result.data,
         pagination: result.pagination
-      }
-
-      // Add security headers
-      const nextResponse = addSecurityHeaders(NextResponse.json(response, { status: 200 }))
-      
-      return nextResponse
+      }, { status: 200 }))
     } catch (serviceError: unknown) {
       console.error('Book service error:', serviceError)
       const error = serviceError as TypedError
