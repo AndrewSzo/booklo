@@ -126,7 +126,13 @@ export default function ReadingProgressSection({ books, isLoading }: ReadingProg
                         className="w-full h-full object-contain rounded bg-white"
                       />
                     ) : (
-                      <div className="text-lg">📖</div>
+                      <div className="w-full h-full bg-gradient-to-br from-emerald-400 via-teal-500 to-blue-600 rounded flex flex-col items-center justify-center text-white shadow-inner">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-90">
+                          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+                          <path d="M8 7h8"/>
+                          <path d="M8 11h8"/>
+                        </svg>
+                      </div>
                     )}
                   </div>
                   
