@@ -1,6 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
-
-type SupabaseClient = Awaited<ReturnType<typeof createClient>>
+import type { SupabaseClient } from '@/lib/supabase/server'
 
 export interface CacheInvalidationResult {
   success: boolean

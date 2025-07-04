@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import type { SupabaseClient } from '@/lib/supabase/server'
 import type { 
   BookResponseDTO,
   BookStatusResponseDTO,
@@ -18,8 +18,6 @@ import type { CreateBookInput } from '@/lib/validations/book.schema'
 import { TagService } from './tag.service'
 import { AuditService } from './audit.service'
 import { CacheService } from './cache.service'
-
-type SupabaseClient = Awaited<ReturnType<typeof createClient>>
 
 export interface BookCreationResult {
   book: BookResponseDTO
@@ -94,6 +92,7 @@ export class BookService {
         isbn: bookData.isbn?.trim() || null,
         cover_url: bookData.cover_url?.trim() || null,
         description: bookData.description?.trim() || null,
+        category: bookData.category?.trim() || null,
         created_by: userId
       }
 
