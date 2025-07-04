@@ -3,6 +3,9 @@ import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import type { Database } from '../database.types'
 
+// Universal type for Supabase client that works with both functions
+export type SupabaseClient = ReturnType<typeof createServerClient<Database>>
+
 export async function createClient() {
   const cookieStore = await cookies()
   

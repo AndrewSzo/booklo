@@ -1,7 +1,5 @@
-import { createClient } from '@/lib/supabase/server'
+import type { SupabaseClient } from '@/lib/supabase/server'
 import type { Database } from '@/lib/database.types'
-
-type SupabaseClient = Awaited<ReturnType<typeof createClient>>
 
 export interface TagResult {
   id: string

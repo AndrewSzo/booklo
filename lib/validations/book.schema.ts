@@ -31,6 +31,11 @@ export const createBookSchema = z.object({
     .max(2000, 'Description must be less than 2000 characters')
     .optional(),
   
+  category: z.string()
+    .max(100, 'Category must be less than 100 characters')
+    .trim()
+    .optional(),
+  
   status: readingStatusSchema
     .default('want_to_read' as ReadingStatus),
   

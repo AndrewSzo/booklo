@@ -1,7 +1,5 @@
-import { createClient } from '@/lib/supabase/server'
+import type { SupabaseClient } from '@/lib/supabase/server'
 import type { BookDeletionAuditLog } from '@/lib/types'
-
-type SupabaseClient = Awaited<ReturnType<typeof createClient>>
 
 export interface AuditLogEntry {
   id?: string
