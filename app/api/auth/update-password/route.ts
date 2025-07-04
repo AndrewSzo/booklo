@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/api'
+import { createClientForEdge } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { newPasswordSchema } from '@/lib/validations/auth'
 
@@ -22,7 +22,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = createClient()
+    // Create response first to handle cookies
+    const response = NextResponse.json({ success: true })
+    const supabase = createClientForEdge(request, response)
     
     const { error } = await supabase.auth.updateUser({
       password
@@ -35,7 +37,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    return NextResponse.json({ success: true })
+    return response
     
   } catch (error) {
     console.error('Update password error:', error)

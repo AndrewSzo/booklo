@@ -1,11 +1,13 @@
-import { createClient } from '@/lib/supabase/api'
-import { NextResponse } from 'next/server'
+import { createClientForEdge } from '@/lib/supabase/server'
+import { NextRequest, NextResponse } from 'next/server'
 
 export const runtime = 'edge'
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient()
+    // Create response first to handle cookies
+    const response = NextResponse.json({ success: true })
+    const supabase = createClientForEdge(request, response)
     
     const { error } = await supabase.auth.signOut()
     
@@ -16,7 +18,7 @@ export async function POST() {
       )
     }
 
-    return NextResponse.json({ success: true })
+    return response
     
   } catch (error) {
     console.error('Logout error:', error)

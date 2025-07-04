@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/api'
+import { createClientForEdge } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { loginSchema } from '@/lib/validations/auth'
 
@@ -41,7 +41,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = createClient()
+    // Create response first to handle cookies
+    const response = NextResponse.json({ success: true })
+    const supabase = createClientForEdge(request, response)
     
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -59,8 +61,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log('Login successful')
-    return NextResponse.json({ success: true })
+    console.log('Login successful - session should be set in cookies')
+    return response
     
   } catch (error) {
     console.error('Login error:', error)

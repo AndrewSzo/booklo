@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/api'
+import { createClientForEdge } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { resetPasswordSchema } from '@/lib/validations/auth'
 
@@ -18,7 +18,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = createClient()
+    // Create response first to handle cookies
+    const response = NextResponse.json({
+      success: 'Instrukcje resetowania hasła zostały wysłane na Twój email'
+    })
+    const supabase = createClientForEdge(request, response)
     
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/reset-password?step=update`
@@ -31,9 +35,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    return NextResponse.json({
-      success: 'Instrukcje resetowania hasła zostały wysłane na Twój email'
-    })
+    return response
     
   } catch (error) {
     console.error('Reset password error:', error)
