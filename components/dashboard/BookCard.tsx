@@ -24,26 +24,7 @@ export default function BookCard({ book, onClick, variant = 'compact', 'data-tes
     }
   }
 
-  const renderStars = (rating: number | null) => {
-    if (!rating) return null
-    
-    return (
-      <div className="flex items-center gap-1" data-testid="book-rating">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <Star
-            key={i}
-            className={`h-3 w-3 sm:h-4 sm:w-4 ${
-              i < rating 
-                ? 'fill-yellow-400 text-yellow-400' 
-                : 'text-muted-foreground'
-            }`}
-            data-testid={`star-${i}`}
-          />
-        ))}
-        <span className="text-xs sm:text-sm text-muted-foreground ml-1" data-testid="rating-value">{rating}</span>
-      </div>
-    )
-  }
+
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -55,7 +36,7 @@ export default function BookCard({ book, onClick, variant = 'compact', 'data-tes
   if (variant === 'compact') {
     return (
       <Card 
-        className="cursor-pointer transition-all duration-200 hover:shadow-md hover:scale-105 active:scale-95 w-full min-h-[140px] sm:min-h-[160px] md:min-h-[180px] lg:min-h-[200px]"
+        className="cursor-pointer transition-all duration-200 hover:shadow-md hover:scale-105 active:scale-95 w-full min-h-[160px] sm:min-h-[180px] md:min-h-[200px] lg:min-h-[220px] xl:min-h-[240px]"
         onClick={handleClick}
         data-testid={testId || "book-card"}
       >
@@ -95,16 +76,34 @@ export default function BookCard({ book, onClick, variant = 'compact', 'data-tes
                   </div>
                 </div>
 
-                {book.category && (
-                  <div className="flex items-center gap-1.5" data-testid="book-category">
-                    <Tag className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0 text-muted-foreground" />
-                    <span className="px-2 py-0.5 sm:px-3 sm:py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-medium">
-                      {book.category}
-                    </span>
-                  </div>
-                )}
+                {/* Category and Rating in a flexible layout */}
+                <div className="space-y-2">
+                  {book.category && (
+                    <div className="flex items-center gap-1.5" data-testid="book-category">
+                      <Tag className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0 text-muted-foreground" />
+                      <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-full text-xs font-medium truncate max-w-[120px] sm:max-w-[140px] md:max-w-[160px]">
+                        {book.category}
+                      </span>
+                    </div>
+                  )}
 
-                {book.user_rating && renderStars(book.user_rating)}
+                  {book.user_rating && (
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`h-3 w-3 ${
+                            i < book.user_rating! 
+                              ? 'fill-yellow-400 text-yellow-400' 
+                              : 'text-muted-foreground'
+                          }`}
+                          data-testid={`star-${i}`}
+                        />
+                      ))}
+                      <span className="text-xs text-muted-foreground ml-1" data-testid="rating-value">{book.user_rating}</span>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="flex items-center gap-1.5 text-xs sm:text-sm md:text-sm text-muted-foreground mt-2 md:mt-3" data-testid="book-date">
@@ -121,7 +120,7 @@ export default function BookCard({ book, onClick, variant = 'compact', 'data-tes
   // Full variant (for larger displays)
   return (
     <Card 
-      className="cursor-pointer transition-all duration-200 hover:shadow-md min-h-[140px] sm:min-h-[160px] md:min-h-[180px] lg:min-h-[200px]"
+      className="cursor-pointer transition-all duration-200 hover:shadow-md min-h-[160px] sm:min-h-[180px] md:min-h-[200px] lg:min-h-[220px] xl:min-h-[240px]"
       onClick={handleClick}
       data-testid={testId || "book-card"}
     >
@@ -156,16 +155,34 @@ export default function BookCard({ book, onClick, variant = 'compact', 'data-tes
                 <p className="text-xs sm:text-sm md:text-sm text-muted-foreground" data-testid="book-author">{book.author}</p>
               </div>
 
-              {book.category && (
-                <div className="flex items-center gap-1.5" data-testid="book-category">
-                  <Tag className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0 text-muted-foreground" />
-                  <span className="px-2 py-0.5 sm:px-3 sm:py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-medium">
-                    {book.category}
-                  </span>
-                </div>
-              )}
+              {/* Category and Rating in a flexible layout */}
+              <div className="space-y-2">
+                {book.category && (
+                  <div className="flex items-center gap-1.5" data-testid="book-category">
+                    <Tag className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0 text-muted-foreground" />
+                    <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-full text-xs font-medium truncate max-w-[120px] sm:max-w-[140px] md:max-w-[160px]">
+                      {book.category}
+                    </span>
+                  </div>
+                )}
 
-              {book.user_rating && renderStars(book.user_rating)}
+                {book.user_rating && (
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`h-3 w-3 ${
+                          i < book.user_rating! 
+                            ? 'fill-yellow-400 text-yellow-400' 
+                            : 'text-muted-foreground'
+                        }`}
+                        data-testid={`star-${i}`}
+                      />
+                    ))}
+                    <span className="text-xs text-muted-foreground ml-1" data-testid="rating-value">{book.user_rating}</span>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="flex items-center justify-between text-xs text-muted-foreground mt-2 md:mt-3" data-testid="book-metadata">

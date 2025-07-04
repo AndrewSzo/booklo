@@ -27,7 +27,7 @@ export default function CurrentlyReadingSection({ books, isLoading, onBookClick 
           <div className="h-4 bg-muted rounded w-16"></div>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="space-y-3 animate-pulse">
               <div className="aspect-[3/4] bg-muted rounded-md"></div>
@@ -93,7 +93,7 @@ export default function CurrentlyReadingSection({ books, isLoading, onBookClick 
         </Button>
       </div>
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {books.map((book) => (
           <BookCard
             key={book.id}

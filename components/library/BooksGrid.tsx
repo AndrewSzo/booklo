@@ -49,27 +49,27 @@ export default function BooksGrid({
     )
   }
 
-  // Calculate grid columns based on both sidebars
+  // Calculate grid columns based on both sidebars - fewer columns for better content fit
   const getGridClasses = () => {
-    // If right sidebar is open, use standard layout with fewer columns
+    // If right sidebar is open, use very few columns to ensure content fits
     if (sidebarOpen) {
-      return 'grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2'
+      return 'grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2'
     }
     
-    // If right sidebar is closed, use more columns for better space utilization
+    // If right sidebar is closed, use moderate columns for better space utilization
     if (!leftSidebarOpen) {
-      // When both sidebars closed, maximize columns for full width
-      return 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'
+      // When both sidebars closed, use fewer columns to ensure content fits well
+      return 'grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'
     }
     
     // If left sidebar is open but right is closed, balanced layout
-    return 'grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+    return 'grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3'
   }
 
   // Books grid with intelligent layout
   return (
     <div className={`
-      grid gap-4 sm:gap-5 md:gap-6 lg:gap-7 xl:gap-8 auto-rows-max
+      grid gap-6 sm:gap-7 md:gap-8 lg:gap-9 xl:gap-10 auto-rows-max
       ${getGridClasses()}
       ${className}
     `} data-testid={testId || "books-grid"}>
