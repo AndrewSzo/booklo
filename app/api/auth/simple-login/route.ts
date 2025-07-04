@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/api'
+import { createClientForEdge } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { loginSchema } from '@/lib/validations/auth'
 
@@ -32,7 +32,12 @@ export async function POST(request: NextRequest) {
     
     console.log('Validation passed, creating Supabase client')
 
-    const supabase = createClient()
+    // Create response first to handle cookies
+    const response = NextResponse.json({ 
+      success: true,
+      user: null // Will be updated after successful login
+    })
+    const supabase = createClientForEdge(request, response)
     
     console.log('Supabase client created, attempting sign in')
     
@@ -60,6 +65,8 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('Login successful')
+    
+    // Update response with user data
     return NextResponse.json({ 
       success: true,
       user: data.user ? {

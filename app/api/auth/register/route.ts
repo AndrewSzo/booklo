@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/api'
+import { createClientForEdge } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { registerSchema } from '@/lib/validations/auth'
 
@@ -50,7 +50,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = createClient()
+    // Create response first to handle cookies
+    const response = NextResponse.json({ 
+      success: 'Sprawdź swoją skrzynkę e-mail w celu potwierdzenia konta' 
+    })
+    const supabase = createClientForEdge(request, response)
     
     const { error } = await supabase.auth.signUp({
       email,
@@ -72,9 +76,7 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('Registration successful')
-    return NextResponse.json({ 
-      success: 'Sprawdź swoją skrzynkę e-mail w celu potwierdzenia konta' 
-    })
+    return response
     
   } catch (error) {
     console.error('Register error:', error)

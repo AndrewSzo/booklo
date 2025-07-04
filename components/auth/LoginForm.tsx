@@ -54,7 +54,11 @@ export default function LoginForm() {
         
         // Redirect to dashboard on success
         const redirectTo = searchParams.get('redirectTo') || '/dashboard'
-        window.location.href = redirectTo
+        
+        // Small delay to ensure cookies are set
+        setTimeout(() => {
+          window.location.href = redirectTo
+        }, 100)
         
       } catch {
         setAuthError('Wystąpił błąd podczas logowania. Spróbuj ponownie.')
